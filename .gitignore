@@ -1,0 +1,5 @@
+.beads/dolt/
+.beads/ephemeral.sqlite3
+.beads/issues.jsonl
+*.sqlite3
+.DS_Store
