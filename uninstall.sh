@@ -19,17 +19,17 @@ TARGET="$(cd "$TARGET" 2>/dev/null && pwd)" || {
 
 echo "Uninstalling BMAD-Beads from: $TARGET"
 
-# Remove BMAD formula files
+# Remove BMAD formula files (regular files or symlinks)
 REMOVED_FORMULAS=0
 for f in "$TARGET/.beads/formulas/"bmad-*.formula.toml; do
-  if [[ -f "$f" ]]; then
+  if [[ -f "$f" || -L "$f" ]]; then
     rm "$f"
     REMOVED_FORMULAS=$((REMOVED_FORMULAS + 1))
   fi
 done
 
-# Remove BMAD skills directory
-if [[ -d "$TARGET/.beads/skills/bmad" ]]; then
+# Remove BMAD skills directory (regular directory or symlink)
+if [[ -d "$TARGET/.beads/skills/bmad" || -L "$TARGET/.beads/skills/bmad" ]]; then
   rm -rf "$TARGET/.beads/skills/bmad"
   echo "  Removed .beads/skills/bmad/"
 fi

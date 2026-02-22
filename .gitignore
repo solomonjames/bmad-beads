@@ -1,5 +1,7 @@
 .beads/dolt/
 .beads/ephemeral.sqlite3
 .beads/issues.jsonl
+.beads/formulas/
+.beads/skills/
 *.sqlite3
 .DS_Store

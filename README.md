@@ -26,6 +26,23 @@ To install into the current directory (if it has `.beads/`):
 ./install.sh
 ```
 
+### Linked install
+
+Use `--link` to create symlinks instead of copies:
+
+```bash
+./install.sh --link /path/to/your/project
+```
+
+With a linked install, updates to the bmad-beads source files are reflected immediately in the target project — no need to re-run `install.sh` after `git pull`. The flag can appear before or after the target path.
+
+This also enables a **self-referencing** workflow for developing bmad-beads itself:
+
+```bash
+bd init
+./install.sh --link
+```
+
 ## Quickstart
 
 ### Full pipeline (new product, idea to code)
@@ -146,6 +163,8 @@ Then update the formula step descriptions to point to your override paths. The o
 
 ## Updating
 
+For **copy** installs, re-run the install after pulling:
+
 ```bash
 cd /path/to/bmad-beads
 git pull
@@ -153,6 +172,14 @@ git pull
 ```
 
 After updating, review changes with `git diff .beads/` in your project.
+
+For **linked** installs, just pull — symlinks point to the source files directly:
+
+```bash
+cd /path/to/bmad-beads
+git pull
+# Done — target project already sees the updated files
+```
 
 ## Uninstall
 

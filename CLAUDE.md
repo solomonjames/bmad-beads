@@ -27,9 +27,11 @@ When installed into a target project, formulas go to `.beads/formulas/` and skil
 
 ```bash
 # Installation
-./install.sh /path/to/target    # Install into a beads-enabled project
-./install.sh                     # Install into current directory
-./uninstall.sh /path/to/target   # Remove from target project
+./install.sh /path/to/target          # Copy into a beads-enabled project
+./install.sh                           # Copy into current directory
+./install.sh --link /path/to/target    # Symlink into target (updates via git pull)
+./install.sh --link                    # Symlink into current directory (self-referencing)
+./uninstall.sh /path/to/target         # Remove from target project
 
 # Preview a formula without creating anything
 bd cook bmad-solutioning --dry-run --var project_name="MyApp"
@@ -47,6 +49,10 @@ bd close <id>                         # Mark complete
 ## Path Contract
 
 Skill files **must** live at `.beads/skills/bmad/` relative to the target project root. Formula step descriptions reference skill files via these paths (e.g., `Follow: .beads/skills/bmad/phase-3-solutioning/create-architecture/step-02-decisions.md`). These paths are resolved by the AI agent at execution time, not by beads itself. Moving skills breaks formula references.
+
+## Linked Install
+
+`./install.sh --link` creates symlinks instead of copies. This is useful for external users who want automatic updates via `git pull`, and for self-referencing — installing bmad-beads into its own `.beads/` directory so edits to source files are reflected immediately. The `.gitignore` excludes `.beads/formulas/` and `.beads/skills/` to keep symlinked content out of version control.
 
 ## Customization Pattern
 

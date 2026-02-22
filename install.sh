@@ -13,15 +13,25 @@ get_version() {
   git rev-parse --short HEAD 2>/dev/null || echo "unknown"
 }
 
-# Determine target directory
+# Parse arguments (flags and target in any order)
+LINK=false
 TARGET=""
+for arg in "$@"; do
+  case "$arg" in
+    --link) LINK=true ;;
+    --target) ;; # handled below
+    -*) echo "Unknown option: $arg"; exit 1 ;;
+    *) TARGET="$arg" ;;
+  esac
+done
+
+# Support legacy --target <path> form
 if [[ "${1:-}" == "--target" && -n "${2:-}" ]]; then
   TARGET="$2"
-elif [[ -n "${1:-}" && "${1:-}" != -* ]]; then
-  TARGET="$1"
-else
-  TARGET="."
 fi
+
+# Default to current directory
+TARGET="${TARGET:-.}"
 
 # Resolve to absolute path
 TARGET="$(cd "$TARGET" 2>/dev/null && pwd)" || {
@@ -36,26 +46,60 @@ if [[ ! -d "$TARGET/.beads" ]]; then
   exit 1
 fi
 
-echo "Installing BMAD-Beads into: $TARGET"
+if $LINK; then
+  echo "Installing BMAD-Beads into: $TARGET (linked)"
+else
+  echo "Installing BMAD-Beads into: $TARGET"
+fi
 
 # Create target directories
 mkdir -p "$TARGET/.beads/formulas"
-mkdir -p "$TARGET/.beads/skills/bmad"
+mkdir -p "$TARGET/.beads/skills"
 
-# Copy formulas
-cp "$SCRIPT_DIR/formulas/"bmad-*.formula.toml "$TARGET/.beads/formulas/"
+if $LINK; then
+  # --- Link mode ---
+
+  # Formulas: remove existing bmad formula files/symlinks, then symlink each file
+  for f in "$TARGET/.beads/formulas/"bmad-*.formula.toml; do
+    if [[ -f "$f" || -L "$f" ]]; then
+      rm "$f"
+    fi
+  done
+  for f in "$SCRIPT_DIR/formulas/"bmad-*.formula.toml; do
+    ln -sf "$f" "$TARGET/.beads/formulas/"
+  done
+
+  # Skills: remove existing bmad directory/symlink, then symlink the whole directory
+  if [[ -d "$TARGET/.beads/skills/bmad" || -L "$TARGET/.beads/skills/bmad" ]]; then
+    rm -rf "$TARGET/.beads/skills/bmad"
+  fi
+  ln -sf "$SCRIPT_DIR/skills/bmad" "$TARGET/.beads/skills/bmad"
+else
+  # --- Copy mode (default) ---
+
+  mkdir -p "$TARGET/.beads/skills/bmad"
+
+  # Copy formulas
+  cp "$SCRIPT_DIR/formulas/"bmad-*.formula.toml "$TARGET/.beads/formulas/"
+
+  # Copy skills (preserving directory structure)
+  cp -R "$SCRIPT_DIR/skills/bmad/"* "$TARGET/.beads/skills/bmad/"
+fi
+
 FORMULA_COUNT=$(ls "$SCRIPT_DIR/formulas/"bmad-*.formula.toml 2>/dev/null | wc -l | tr -d ' ')
-
-# Copy skills (preserving directory structure)
-cp -R "$SCRIPT_DIR/skills/bmad/"* "$TARGET/.beads/skills/bmad/"
 SKILL_COUNT=$(find "$SCRIPT_DIR/skills/bmad" -type f -name '*.md' | wc -l | tr -d ' ')
 
 # Write version file
 VERSION=$(get_version)
 echo "$VERSION" > "$TARGET/$VERSION_FILE"
 
+MODE=""
+if $LINK; then
+  MODE=" (linked)"
+fi
+
 echo ""
-echo "BMAD-Beads installed successfully!"
+echo "BMAD-Beads installed successfully!$MODE"
 echo "  Formulas: $FORMULA_COUNT"
 echo "  Skills:   $SKILL_COUNT"
 echo "  Version:  $VERSION"
