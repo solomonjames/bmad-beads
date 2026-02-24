@@ -1,4 +1,4 @@
-description = "Phase 1: Product analysis — discover vision, users, metrics, and MVP scope through collaborative facilitation"
+description = "Phase 1: Product analysis — discover vision, users, metrics, and MVP scope through collaborative facilitation. NOTE: These phase skills are not yet available as plugin skills; use beads formulas for full pipeline workflows."
 formula = "bmad-analysis"
 type = "workflow"
 version = 1

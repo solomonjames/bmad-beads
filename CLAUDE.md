@@ -4,68 +4,68 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-BMAD-Beads is a workflow orchestration framework that ports the BMAD (Business-driven Multi-Agent Development) methodology v6.0 into [beads](https://github.com/steveyegge/beads) formulas. It provides structured product development with AI agent personas, human review gates, and a progressive pipeline from product discovery through implementation. This is **not** a code library — it is a template/workflow system with no build step, no tests, and no package manager.
+BMAD-Beads is a Claude Code plugin that implements the BMAD (Business-driven Multi-Agent Development) methodology. It provides structured product development with agent personas, complexity routing, spec engineering, and adversarial review. It complements execution-focused plugins like superpowers by adding methodology skills.
+
+This is **not** a code library — it is a plugin/workflow system with no build step, no tests, and no package manager.
 
 ## Repository Structure
 
-- `formulas/` — 7 TOML workflow definitions (copied to target project's `.beads/formulas/`)
-- `skills/bmad/agents/` — 8 agent persona files defining communication style and expertise
-- `skills/bmad/phase-{1..4}-*/` — Step-by-step skill files for each pipeline phase
-- `skills/bmad/quick-spec/` — 4-step conversational spec engineering flow
-- `skills/bmad/quick-dev/` — 6-step flexible implementation flow
-- `skills/bmad/templates/` — 8 output document templates (tech-spec, story, PRD, etc.)
-- `install.sh` / `uninstall.sh` — Copy formulas and skills into a beads-enabled target project
-- `docs/beads-workflows.md` — Comprehensive workflow documentation
+### Plugin Infrastructure
+- `.claude-plugin/plugin.json` — Plugin manifest (name, version, metadata)
+- `.claude-plugin/marketplace.json` — Self-hosted marketplace config
+- `hooks/` — SessionStart hook that injects `using-bmad` meta-skill into context
+- `commands/` — Slash commands (`/quick-spec`, `/quick-dev`, `/assess-complexity`)
+
+### Skills (Plugin Skills)
+- `skills/using-bmad/` — Meta-skill: routing table for when to use BMAD vs other skills
+- `skills/bmad-quick-spec/` — Merged 4-phase spec engineering flow
+- `skills/bmad-quick-dev/` — Merged 6-phase implementation flow + adversarial reviewer prompt
+- `skills/bmad-complexity-assessment/` — Complexity signal evaluation and routing
+- `skills/bmad-spec-engineering/` — Given/When/Then format, ready-for-dev standards
+- `skills/bmad-adversarial-review/` — Information-asymmetric code review + reviewer prompt
+- `skills/bmad-personas/` — 8 expert persona files + index
+- `skills/bmad-artifact-templates/` — 8 output templates + index
+
+### Beads Integration (Legacy)
+- `formulas/` — 7 TOML workflow definitions for beads users
+- `skills/bmad/` — Original step-by-step skill files for beads formulas
+- `legacy/install.sh` / `legacy/uninstall.sh` — Copy formulas/skills into beads-enabled projects
+- `docs/beads-workflows.md` — Beads workflow documentation
 
 ## How It Works
 
-Formulas (TOML) define **step sequences with dependencies**. Each step references an **agent persona** (who) and a **skill file** (how). Skill files contain detailed instructions, success criteria, and expected outputs. Human review gates require manual approval before the pipeline continues.
+### As a Plugin
+The SessionStart hook injects the `using-bmad` meta-skill into every session. This provides a routing table so the agent knows when to invoke BMAD skills. Users trigger flows via slash commands (`/quick-spec`) or direct skill invocation (`bmad:bmad-quick-spec`).
 
-When installed into a target project, formulas go to `.beads/formulas/` and skills go to `.beads/skills/bmad/`. The AI agent reads step descriptions, loads the referenced persona, follows the skill file instructions, and produces output artifacts in `_bmad-output/`.
+### As Beads Formulas
+Formulas (TOML) define step sequences with dependencies. Each step references an agent persona and a skill file. The `legacy/install.sh` script copies formulas and skills into a beads-enabled project.
 
-## Key Commands
+## Skill Authoring
 
-```bash
-# Installation
-./install.sh /path/to/target          # Copy into a beads-enabled project
-./install.sh                           # Copy into current directory
-./install.sh --link /path/to/target    # Symlink into target (updates via git pull)
-./install.sh --link                    # Symlink into current directory (self-referencing)
-./uninstall.sh /path/to/target         # Remove from target project
+Each plugin skill is a single `SKILL.md` file with:
+- **YAML frontmatter:** `name` and `description` (used for skill discovery and auto-triggering)
+- **Checklist:** Items tracked via TodoWrite during execution
+- **Phases:** Logical groupings of work within the skill
+- **Sub-skill references:** `bmad:skill-name` for other BMAD skills, `superpowers:skill-name` for superpowers skills
 
-# Preview a formula without creating anything
-bd cook bmad-solutioning --dry-run --var project_name="MyApp"
+### Naming Convention
+All skills are prefixed `bmad-` to avoid collisions. Invoked as `bmad:bmad-quick-spec` (plugin:skill format).
 
-# Pour a formula (create a persistent molecule)
-bd mol pour bmad-full --var project_name="MyApp"
+### Persona Pattern
+Skills reference personas by saying "Adopt the Barry persona from `bmad:bmad-personas`." The agent reads the persona file and embodies that identity throughout the workflow.
 
-# Work through steps
-bd ready                              # Find next unblocked step
-bd show <id>                          # Read step description
-bd update <id> --status=in_progress   # Claim it
-bd close <id>                         # Mark complete
-```
+## Key Patterns
 
-## Path Contract
-
-Skill files **must** live at `.beads/skills/bmad/` relative to the target project root. Formula step descriptions reference skill files via these paths (e.g., `Follow: .beads/skills/bmad/phase-3-solutioning/create-architecture/step-02-decisions.md`). These paths are resolved by the AI agent at execution time, not by beads itself. Moving skills breaks formula references.
-
-## Linked Install
-
-`./install.sh --link` creates symlinks instead of copies. This is useful for external users who want automatic updates via `git pull`, and for self-referencing — installing bmad-beads into its own `.beads/` directory so edits to source files are reflected immediately. The `.gitignore` excludes `.beads/formulas/` and `.beads/skills/` to keep symlinked content out of version control.
-
-## Customization Pattern
-
-Override skill files by creating a `bmad-local/` namespace in `.beads/skills/` in the target project, then updating formula step descriptions to point to the override paths. Original `bmad/` files stay untouched for easy updates via `git pull && ./install.sh`.
-
-## Variables
-
-All formulas require `--var project_name="..."`. Quick flows also require `--var feature="..."`. Optional: `tech_spec_path` (quick-dev Mode A), `planning_artifacts`, `impl_artifacts`.
+- **Soft dependencies on superpowers:** Skills say `**REQUIRED SUB-SKILL:** Use superpowers:test-driven-development`. If superpowers isn't installed, the agent falls back gracefully.
+- **Information asymmetry in reviews:** Adversarial review uses a subagent that sees ONLY the diff, not the spec or conversation.
+- **Human gates:** Flow skills pause for human approval at key points (spec review, finding resolution).
+- **WIP lifecycle:** Tech specs track progress via `stepsCompleted` in YAML frontmatter and transition through statuses: `in-progress` → `review` → `ready-for-dev` → `completed`.
 
 ## Editing Guidelines
 
-- Formula files use TOML with `[[step]]` arrays defining workflow sequences. Each step has `id`, `title`, `description`, `depends_on`, and variable interpolation via `{{var_name}}`.
-- Skill files are Markdown with consistent sections: Agent, Context (inputs/outputs/dependencies), Instructions, Success Criteria, and Next Step pointer.
-- Agent persona files define Identity, Communication Style, Core Principles, and Activation Triggers.
-- Templates use YAML frontmatter for metadata tracking (e.g., `stepsCompleted` for WIP lifecycle).
-- When adding new steps, maintain the dependency chain — each step's `depends_on` must reference existing step IDs.
+- **Plugin skills** (`skills/bmad-*/SKILL.md`): Single file per skill with YAML frontmatter. Follow superpowers' writing-skills guidance for length and structure.
+- **Commands** (`commands/*.md`): Lightweight wrappers with YAML frontmatter (`description`, `disable-model-invocation: true`) that invoke a skill.
+- **Hooks** (`hooks/`): SessionStart injects meta-skill content. Uses JSON output compatible with both Cursor and Claude Code.
+- **Personas** (`skills/bmad-personas/*.md`): Define Identity, Communication Style, Core Principles, Activation Triggers.
+- **Templates** (`skills/bmad-artifact-templates/*.md`): Use `{{variable}}` placeholders and YAML frontmatter for metadata.
+- **Beads formulas** (`formulas/*.toml`): TOML with `[[step]]` arrays. Each step has `id`, `title`, `description`, `depends_on`.

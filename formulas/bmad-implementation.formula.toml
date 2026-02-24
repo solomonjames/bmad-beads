@@ -1,4 +1,4 @@
-description = "Phase 4: Sprint execution — planning, story prep, development, review, and retrospective"
+description = "Phase 4: Sprint execution — planning, story prep, development, review, and retrospective. NOTE: These phase skills are not yet available as plugin skills; use beads formulas for full pipeline workflows."
 formula = "bmad-implementation"
 type = "workflow"
 version = 1

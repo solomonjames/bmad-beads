@@ -1,4 +1,4 @@
-description = "Phase 2: Product planning — create PRD with requirements and UX design specification"
+description = "Phase 2: Product planning — create PRD with requirements and UX design specification. NOTE: These phase skills are not yet available as plugin skills; use beads formulas for full pipeline workflows."
 formula = "bmad-planning"
 type = "workflow"
 version = 1

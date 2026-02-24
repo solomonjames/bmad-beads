@@ -1,4 +1,4 @@
-description = "Phase 3: Architecture decisions, epic/story breakdown, and implementation readiness"
+description = "Phase 3: Architecture decisions, epic/story breakdown, and implementation readiness. NOTE: These phase skills are not yet available as plugin skills; use beads formulas for full pipeline workflows."
 formula = "bmad-solutioning"
 type = "workflow"
 version = 1

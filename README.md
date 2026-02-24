@@ -1,142 +1,106 @@
 # BMAD-Beads
 
-BMAD (Business-driven Multi-Agent Development) methodology ported to [beads](https://github.com/steveyegge/beads) formulas. Framework-agnostic, language-agnostic — works with any AI coding assistant in any project.
+BMAD (Business-driven Multi-Agent Development) methodology as a **Claude Code plugin**. Adds structured product development — personas, complexity routing, spec engineering, adversarial review — on top of your existing development workflow.
 
-BMAD provides a structured development lifecycle with agent personas, human review gates, and a progressive pipeline from product discovery through implementation. Beads formulas orchestrate the workflow; skill files define how each step is executed.
-
-## Prerequisites
-
-- [beads](https://github.com/steveyegge/beads) v0.55+ installed
-- `bd init` run in your target project
-- An AI coding assistant (Claude Code, Cursor, etc.)
+Works standalone or paired with [superpowers](https://github.com/obra/superpowers) for execution skills (TDD, debugging, worktrees).
 
 ## Install
+
+### As a Claude Code plugin (recommended)
+
+```bash
+# Add the marketplace
+/plugin marketplace add https://github.com/solomonjames/bmad-beads
+
+# Install the plugin
+/plugin install bmad
+```
+
+### From local clone
 
 ```bash
 git clone https://github.com/solomonjames/bmad-beads.git
 cd bmad-beads
-./install.sh /path/to/your/project
+/plugin marketplace add .
+/plugin install bmad
 ```
 
-This copies formulas into `.beads/formulas/` and skills into `.beads/skills/bmad/` in your target project.
+## Quick Start
 
-To install into the current directory (if it has `.beads/`):
-
-```bash
-./install.sh
-```
-
-### Linked install
-
-Use `--link` to create symlinks instead of copies:
-
-```bash
-./install.sh --link /path/to/your/project
-```
-
-With a linked install, updates to the bmad-beads source files are reflected immediately in the target project — no need to re-run `install.sh` after `git pull`. The flag can appear before or after the target path.
-
-This also enables a **self-referencing** workflow for developing bmad-beads itself:
-
-```bash
-bd init
-./install.sh --link
-```
-
-## Quickstart
-
-### Full pipeline (new product, idea to code)
-
-```bash
-bd mol pour bmad-full --var project_name="MyApp"
-bd ready    # first step: "Initialize brief and discover vision for MyApp"
-```
-
-### Single phase
-
-```bash
-bd mol pour bmad-solutioning --var project_name="MyApp"
-```
-
-### Quick spec (produce a tech-spec conversationally)
-
-```bash
-bd mol pour bmad-quick-spec \
-  --var project_name="MyApp" \
-  --var feature="Add avatar upload"
-```
-
-### Quick dev (implement from spec or direct instructions)
-
-```bash
-# Mode A — from a tech-spec
-bd mol pour bmad-quick-dev \
-  --var project_name="MyApp" \
-  --var feature="Add avatar upload" \
-  --var tech_spec_path="path/to/tech-spec-avatar-upload.md"
-
-# Mode B — direct instructions (no tech-spec)
-bd mol pour bmad-quick-dev \
-  --var project_name="MyApp" \
-  --var feature="Add avatar upload"
-```
-
-## Formula Reference
-
-| Formula | Phase | Steps | Human Gates | Use When |
-|---------|-------|-------|-------------|----------|
-| `bmad-analysis` | 1 | 4 | 1 | Starting a new product — discover vision, users, metrics, scope |
-| `bmad-planning` | 2 | 6 | 2 | Creating PRD and UX design specification |
-| `bmad-solutioning` | 3 | 6 | 2 | Architecture decisions, epics, stories, readiness check |
-| `bmad-implementation` | 4 | 7 | 2 | Sprint execution — plan, develop, review, retrospective |
-| `bmad-quick-spec` | — | 4 | 1 | Conversational spec engineering — produce implementation-ready tech-spec |
-| `bmad-quick-dev` | — | 6 | 1 | Flexible implementation — execute tech-specs or direct instructions |
-| `bmad-full` | 1–4 | 23 | 7 | Full product lifecycle from idea to working code |
-
-Preview any formula without creating anything:
-
-```bash
-bd cook bmad-solutioning --dry-run --var project_name="MyApp"
-```
-
-## Variable Reference
-
-| Variable | Required | Default | Used By |
-|----------|----------|---------|---------|
-| `project_name` | Yes | — | All formulas |
-| `feature` | Yes | — | `bmad-quick-spec`, `bmad-quick-dev` |
-| `tech_spec_path` | No | — | `bmad-quick-dev` only (Mode A if provided) |
-| `planning_artifacts` | No | `_bmad-output/planning-artifacts` | Phases 1–3, full |
-| `impl_artifacts` | No | `_bmad-output/implementation-artifacts` | Phases 3–4, quick-spec, quick-dev, full |
-
-## Working a Step
-
-Once a formula is poured, steps become beads issues with dependencies:
-
-```bash
-bd ready                              # find next unblocked step
-bd show <id>                          # read step description
-bd update <id> --status=in_progress   # claim it
-# ... do the work ...
-bd close <id>                         # mark complete
-bd ready                              # next step unlocks
-```
-
-Each step description names an **agent persona** and a **skill file**:
+### Slash commands
 
 ```
-Agent: Winston (Architect)
-Follow: .beads/skills/bmad/phase-3-solutioning/create-architecture/step-02-decisions.md
+/quick-spec          # Conversational spec engineering — produces a ready-for-dev tech spec
+/quick-dev           # Implementation flow — mode detection, execution, review
+/assess-complexity   # Evaluate complexity and route to right depth of planning
 ```
 
-1. **Load the persona** — Read the agent file to adopt communication style and principles
-2. **Read the skill file** — Contains detailed instructions, success criteria, expected outputs
-3. **Do the work** — Follow the instructions, produce artifacts
-4. **Close the step** — `bd close <id>` when success criteria are met
+### Direct skill invocation
 
-Steps marked `(human)` are review gates requiring manual approval before the pipeline continues.
+Skills can also be invoked directly via the Skill tool:
 
-### Agent Personas
+```
+bmad:bmad-quick-spec
+bmad:bmad-quick-dev
+bmad:bmad-complexity-assessment
+bmad:bmad-spec-engineering
+bmad:bmad-adversarial-review
+bmad:bmad-personas
+bmad:bmad-artifact-templates
+```
+
+## How It Works
+
+BMAD provides **methodology skills** that structure how you approach development:
+
+1. **Assess complexity** — Count complexity signals, route to direct execution, quick-spec, or full planning
+2. **Spec engineering** — Conversational flow that produces a ready-for-dev tech spec with Given/When/Then acceptance criteria
+3. **Implementation** — Mode A (from tech-spec) or Mode B (direct instructions) with continuous execution
+4. **Self-check** — 12-point audit covering tasks, tests, ACs, and code quality
+5. **Adversarial review** — Code review with information asymmetry (reviewer sees only the diff)
+6. **Finding resolution** — Walk through, auto-fix, or skip findings with human approval
+
+### Superpowers Integration
+
+BMAD complements superpowers — it decides **what** to build, superpowers decides **how**:
+
+| BMAD | Superpowers |
+|------|-------------|
+| Complexity routing | — |
+| Spec engineering | — |
+| Personas | — |
+| — | TDD (red-green-refactor) |
+| — | Systematic debugging |
+| — | Git worktrees |
+| Adversarial review | Verification before completion |
+
+If superpowers isn't installed, BMAD skills still work — they just won't delegate to superpowers execution skills.
+
+## Skills Reference
+
+### Flow Skills
+
+| Skill | Command | Description |
+|-------|---------|-------------|
+| `bmad-quick-spec` | `/quick-spec` | 4-phase spec engineering: understand, investigate, generate, review |
+| `bmad-quick-dev` | `/quick-dev` | 6-phase implementation: mode detect, context, execute, self-check, review, resolve |
+| `bmad-complexity-assessment` | `/assess-complexity` | Complexity signals → routing to right depth |
+
+### Methodology Skills
+
+| Skill | Description |
+|-------|-------------|
+| `bmad-spec-engineering` | Given/When/Then format, task format, ready-for-dev standards |
+| `bmad-adversarial-review` | Information-asymmetric code review via subagents |
+
+### Reference Skills
+
+| Skill | Description |
+|-------|-------------|
+| `bmad-personas` | 8 expert personas (analyst, architect, dev, PM, QA, SM, UX, solo dev) |
+| `bmad-artifact-templates` | 8 output templates (tech-spec, story, PRD, architecture, etc.) |
+
+## Agent Personas
 
 | Agent | Name | Specialty |
 |-------|------|-----------|
@@ -149,50 +113,29 @@ Steps marked `(human)` are review gates requiring manual approval before the pip
 | `ux-designer.md` | Sally | UX design, user research, visual direction |
 | `quick-flow-solo-dev.md` | Barry | Full-stack quick flow, spec-to-implementation |
 
-## Customization
+## Beads Integration (Optional)
 
-To override BMAD skill files without modifying the originals, create a `bmad-local/` namespace:
-
-```
-.beads/skills/bmad-local/
-  agents/architect.md          # your custom architect persona
-  phase-4-implementation/...   # your custom implementation steps
-```
-
-Then update the formula step descriptions to point to your override paths. The original `bmad/` files remain untouched for easy updates.
-
-## Updating
-
-For **copy** installs, re-run the install after pulling:
+BMAD also works as a beads formula system for users who prefer ticket-based orchestration. See [docs/beads-workflows.md](docs/beads-workflows.md) for details.
 
 ```bash
-cd /path/to/bmad-beads
-git pull
-./install.sh /path/to/your/project
+# Install for beads (legacy method)
+./legacy/install.sh /path/to/your/project
+
+# Pour a formula
+bd mol pour bmad-quick-spec --var project_name="MyApp" --var feature="Add avatar upload"
 ```
 
-After updating, review changes with `git diff .beads/` in your project.
+### Formula Reference
 
-For **linked** installs, just pull — symlinks point to the source files directly:
-
-```bash
-cd /path/to/bmad-beads
-git pull
-# Done — target project already sees the updated files
-```
-
-## Uninstall
-
-```bash
-cd /path/to/bmad-beads
-./uninstall.sh /path/to/your/project
-```
-
-Removes all `bmad-*.formula.toml` files and the `.beads/skills/bmad/` directory.
-
-## Path Contract
-
-Skills **must** live at `.beads/skills/bmad/` relative to the project root. Formulas reference skill files via these paths in step descriptions (e.g., `Follow: .beads/skills/bmad/...`). These paths are resolved by the AI agent at execution time, not by beads itself. Moving skills to a different location will break the formula references.
+| Formula | Steps | Gates | Use When |
+|---------|-------|-------|----------|
+| `bmad-analysis` | 4 | 1 | Product vision, users, metrics, scope |
+| `bmad-planning` | 6 | 2 | PRD and UX design specification |
+| `bmad-solutioning` | 6 | 2 | Architecture, epics, stories, readiness |
+| `bmad-implementation` | 7 | 2 | Sprint execution and review |
+| `bmad-quick-spec` | 4 | 1 | Conversational spec engineering |
+| `bmad-quick-dev` | 6 | 1 | Flexible implementation |
+| `bmad-full` | 23 | 7 | Complete product lifecycle |
 
 ## License
 

@@ -1,4 +1,4 @@
-description = "Full BMAD pipeline: Analysis → Planning → Solutioning → Implementation. Complete product development lifecycle."
+description = "Full BMAD pipeline: Analysis → Planning → Solutioning → Implementation. Complete product development lifecycle. NOTE: These phase skills are not yet available as plugin skills; use beads formulas for full pipeline workflows."
 formula = "bmad-full"
 type = "workflow"
 version = 1

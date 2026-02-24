@@ -1,11 +1,12 @@
-description = "Quick Spec: Conversational spec engineering — ask questions, investigate code, produce implementation-ready tech-spec with WIP lifecycle and adversarial review option"
+description = "Quick Spec: Conversational spec engineering — ask questions, investigate code, produce implementation-ready tech-spec with WIP lifecycle and adversarial review option. NOTE: Plugin users can use /quick-spec or invoke bmad:bmad-quick-spec directly."
 formula = "bmad-quick-spec"
 type = "workflow"
-version = 1
+version = 2
 
 [[steps]]
 description = """
 Agent: Barry (Quick Flow Solo Dev) — Load persona from .beads/skills/bmad/agents/quick-flow-solo-dev.md
+Plugin skill: bmad:bmad-quick-spec (Phase 1: Understand)
 Follow: .beads/skills/bmad/quick-spec/step-01-understand.md
 Inputs: Feature description, existing codebase
 Output: WIP tech-spec initialized with overview, problem statement, solution, and scope"""
@@ -16,6 +17,7 @@ title = "Understand requirement: {{feature}}"
 depends_on = ["understand"]
 description = """
 Agent: Barry (Quick Flow Solo Dev) — .beads/skills/bmad/agents/quick-flow-solo-dev.md
+Plugin skill: bmad:bmad-quick-spec (Phase 2: Investigate)
 Follow: .beads/skills/bmad/quick-spec/step-02-investigate.md
 Inputs: WIP tech-spec with core understanding
 Output: Technical context mapped — tech stack, patterns, files to modify, test patterns documented"""
@@ -26,6 +28,7 @@ title = "Investigate technical constraints"
 depends_on = ["investigate"]
 description = """
 Agent: Barry (Quick Flow Solo Dev) — .beads/skills/bmad/agents/quick-flow-solo-dev.md
+Plugin skill: bmad:bmad-quick-spec (Phase 3: Generate)
 Follow: .beads/skills/bmad/quick-spec/step-03-generate.md
 Inputs: WIP tech-spec with technical context
 Output: Complete implementation plan with dependency-ordered tasks, Given/When/Then ACs, testing strategy"""
@@ -36,6 +39,7 @@ title = "Generate implementation plan and acceptance criteria"
 depends_on = ["generate"]
 description = """
 Human review gate. Barry presents complete tech-spec for approval.
+Plugin skill: bmad:bmad-quick-spec (Phase 4: Review)
 Follow: .beads/skills/bmad/quick-spec/step-04-review.md
 Checklist: Tasks specific with file paths? ACs testable (Given/When/Then)? Dependency order correct? Self-contained? Ready-for-dev standard met?
 Options: Edit, request adversarial review, finalize. On approval: status → ready-for-dev, rename WIP → tech-spec-{slug}.md"""
