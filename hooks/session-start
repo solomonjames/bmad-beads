@@ -24,6 +24,22 @@ escape_for_json() {
 using_bmad_escaped=$(escape_for_json "$using_bmad_content")
 session_context="<EXTREMELY_IMPORTANT>\nYou have BMAD methodology skills available.\n\n**Below is the full content of your 'bmad:using-bmad' skill - your guide to BMAD methodology skills. For all other skills, use the 'Skill' tool:**\n\n${using_bmad_escaped}\n</EXTREMELY_IMPORTANT>"
 
+# Walk up from CWD to find a .beads/ directory (validated by metadata.json)
+beads_root=""
+search_dir="$PWD"
+while [ "$search_dir" != "/" ]; do
+    if [ -f "$search_dir/.beads/metadata.json" ]; then
+        beads_root="$search_dir"
+        break
+    fi
+    search_dir="$(dirname "$search_dir")"
+done
+
+if [ -n "$beads_root" ]; then
+    beads_root_escaped=$(escape_for_json "$beads_root")
+    session_context="${session_context}\n\n<BEADS_PROJECT_DETECTED>\n**Beads project root:** ${beads_root_escaped}\n\nAll \`bd\` commands must be run from within this directory. The \`bd\` CLI discovers \`.beads/\` by walking up from CWD — running it outside the project tree will fail.\n\nRun \`bd prime\` for full workflow context.\n</BEADS_PROJECT_DETECTED>"
+fi
+
 # Output context injection as JSON.
 # Keep both shapes for compatibility:
 # - Cursor hooks expect additional_context.

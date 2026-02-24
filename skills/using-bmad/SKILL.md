@@ -56,7 +56,7 @@ bd close bd-abc123                          # done
 | Phase transitions + decisions | `comments` | Human-readable audit trail |
 
 ### How It Works
-- **Detection:** Skills check for beads by running `which bd`. If beads is not installed or no ticket ID is provided, all beads steps are silently skipped.
+- **Detection:** Skills check for beads by running `which bd`. **The `bd` CLI discovers `.beads/` by walking up from CWD, so all `bd` commands must be run from within the project directory.** If beads is not installed, CWD is outside the project tree, or no ticket ID is provided, all beads steps are silently skipped.
 - **Beads-primary:** When a ticket ID is provided, all spec content is written to ticket fields. Local files are only created when beads is not active.
 - **Sub-tickets as tasks:** Implementation tasks from quick-spec become sub-tickets. Quick-dev tracks progress by updating and closing sub-tickets.
 - **Metadata read-merge-write:** `bd update --metadata` replaces the full JSON blob, so skills always read current metadata first (`bd show {ticket_id} --json`), merge new fields, then write the full object back.

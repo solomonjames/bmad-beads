@@ -16,8 +16,9 @@ If `{ticket_id}` is set and beads is active, the ticket becomes the spec artifac
 ### Detection
 1. Check if `{ticket_id}` is set (non-empty). If not, set `{beads_active}` to false.
 2. Verify beads is installed: `which bd`. If not found, warn user ("beads not installed, proceeding without ticket tracking"), set `{beads_active}` to false.
-3. Load ticket: `bd show {ticket_id} --json`. If the ticket doesn't exist, warn and set `{beads_active}` to false.
-4. Store the ticket's current `metadata` JSON for read-merge-write operations.
+3. Ensure working directory: Before running `bd` commands, verify you are within the project directory containing `.beads/`. If session context provides a beads project root, `cd` to it.
+4. Load ticket: `bd show {ticket_id} --json`. If the ticket doesn't exist, warn and set `{beads_active}` to false.
+5. Store the ticket's current `metadata` JSON for read-merge-write operations.
 
 ### Storage Routing
 - **Without beads:** Write to `_bmad-output/tech-spec-wip.md` (local file flow)
