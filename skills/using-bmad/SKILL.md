@@ -33,14 +33,14 @@ BMAD (Business-driven Multi-Agent Development) provides **methodology skills** f
 
 ## Beads Integration (Optional)
 
-BMAD skills optionally integrate with **beads** for issue-based tracking. When a ticket ID is provided, skills read context from and write progress back to the beads issue while still writing local files.
+BMAD skills optionally integrate with **beads** for issue-based tracking. When a ticket ID is provided, the ticket becomes the spec artifact. No local files are created — all content lives in beads fields and sub-tickets.
 
 ### Ticket-Based Workflow
 ```
 bd create "Add avatar upload" -t feature    # idea captured
 ... later ...
-/quick-spec bd-abc123                       # spec develops in the ticket
-/quick-dev bd-abc123                        # implementation tracked in the ticket
+/quick-spec bd-abc123                       # spec develops IN the ticket
+/quick-dev bd-abc123                        # implementation tracked via sub-tickets
 bd close bd-abc123                          # done
 ```
 
@@ -51,13 +51,14 @@ bd close bd-abc123                          # done
 | Spec summary (problem, solution, scope) | `design` | Design notes |
 | Acceptance criteria (Given/When/Then) | `acceptance_criteria` | Exact purpose match |
 | Technical context + task list | `notes` | Implementation details |
+| Implementation tasks | Sub-tickets | Individual task tracking |
 | BMAD state machine | `metadata` (JSON) | Machine-readable phase/step tracking |
 | Phase transitions + decisions | `comments` | Human-readable audit trail |
-| Full tech spec file | Local file | Referenced via `metadata.tech_spec_path` |
 
 ### How It Works
-- **Detection:** Skills check for beads by running `which bd`. If beads is not installed or no ticket ID is provided, all `[BEADS]` steps are silently skipped.
-- **Dual storage:** Local files are always written (existing behavior). Beads fields hold structured summaries.
+- **Detection:** Skills check for beads by running `which bd`. If beads is not installed or no ticket ID is provided, all beads steps are silently skipped.
+- **Beads-primary:** When a ticket ID is provided, all spec content is written to ticket fields. Local files are only created when beads is not active.
+- **Sub-tickets as tasks:** Implementation tasks from quick-spec become sub-tickets. Quick-dev tracks progress by updating and closing sub-tickets.
 - **Metadata read-merge-write:** `bd update --metadata` replaces the full JSON blob, so skills always read current metadata first (`bd show {ticket_id} --json`), merge new fields, then write the full object back.
 - **Comments at phase boundaries only:** One comment per phase transition (4 for quick-spec, 6 for quick-dev) to avoid noise.
 

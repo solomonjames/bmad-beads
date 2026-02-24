@@ -11,22 +11,22 @@ Implementation flow that handles both spec-driven (Mode A) and direct instructio
 
 ## Beads Integration (Optional)
 
-If `{ticket_id}` is set, this skill syncs progress to the beads issue alongside local files.
+If `{ticket_id}` is set and beads is active, the ticket is the primary data source. When the ticket contains a ready-for-dev spec (from quick-spec), all spec content is loaded from ticket fields — no local files needed.
 
 ### Detection
-1. Check if `{ticket_id}` is set (non-empty). If not, set `{beads_active}` to false and skip all `[BEADS]` steps.
+1. Check if `{ticket_id}` is set (non-empty). If not, set `{beads_active}` to false.
 2. Verify beads is installed: `which bd`. If not found, warn user ("beads not installed, proceeding without ticket tracking"), set `{beads_active}` to false.
 3. Load ticket: `bd show {ticket_id} --json`. If the ticket doesn't exist, warn and set `{beads_active}` to false.
 4. Store the ticket's current `metadata` JSON for read-merge-write operations.
 
 ### Ticket-Driven Mode Detection
-When `{beads_active}`, the ticket's metadata can drive automatic mode selection:
-- If `metadata.tech_spec_path` exists and the referenced file has `status: 'ready-for-dev'` → auto-select **Mode A**
-- If `metadata.tech_spec_path` exists but spec status is not ready-for-dev → warn user that spec is incomplete, suggest running `/quick-spec {ticket_id}` first
-- If no `metadata.tech_spec_path` → fall through to normal Mode B detection
+When `{beads_active}`, check ticket metadata:
+- If `metadata.spec_status == "ready-for-dev"` → load spec from ticket fields: `design` (overview), `notes` (technical context), `acceptance_criteria` (ACs), sub-tickets (implementation tasks via `bd list --parent {ticket_id} --json`). Auto-select **Mode A**.
+- If `metadata.bmad_phase == "spec"` and `spec_status != "ready-for-dev"` → warn user that spec is incomplete, suggest running `/quick-spec {ticket_id}` first.
+- Otherwise → fall through to normal Mode B detection.
 
 ### Metadata Read-Merge-Write Pattern
-Every `[BEADS]` metadata update must:
+Every metadata update must:
 1. Read current metadata: `bd show {ticket_id} --json` → extract `.metadata`
 2. Merge new fields into the existing object (never discard existing keys)
 3. Write full merged JSON: `bd update {ticket_id} --metadata '{...}'`
@@ -36,19 +36,13 @@ Every `[BEADS]` metadata update must:
 Track progress using TodoWrite:
 
 - [ ] Capture baseline commit
-- [ ] Detect execution mode (tech-spec vs. direct)
-- [ ] [BEADS] Phase 1 sync — status, metadata, comment
+- [ ] Detect execution mode — tech-spec vs. direct (or ticket-driven if beads-active)
 - [ ] Gather context and confirm plan (Mode B only)
-- [ ] [BEADS] Phase 2 sync — notes, acceptance_criteria, metadata, comment (Mode B only)
-- [ ] Execute implementation (all tasks, continuous)
-- [ ] [BEADS] Phase 3 sync — metadata, summary comment
+- [ ] Execute implementation — all tasks continuous, track via sub-tickets if beads-active
 - [ ] Run 12-point self-check
-- [ ] [BEADS] Phase 4 sync — metadata, comment
 - [ ] Adversarial review with information asymmetry
-- [ ] [BEADS] Phase 5 sync — metadata, findings comment
 - [ ] Human review gate — resolve findings
-- [ ] Completion summary
-- [ ] [BEADS] Phase 6 sync — metadata finalized, completion comment, close prompt
+- [ ] Completion summary — update ticket or local spec, close sub-tickets
 
 ---
 
@@ -65,12 +59,12 @@ Read `project-context.md` if it exists. Note project conventions, patterns, cons
 
 ### Determine Execution Mode
 
-**`[BEADS]`** If `{beads_active}`, check ticket metadata first (see "Ticket-Driven Mode Detection" above) before falling through to normal detection.
+**If `{beads_active}`:** Check ticket metadata first (see "Ticket-Driven Mode Detection" above) before falling through to normal detection.
 
 **Mode A — Tech Spec (structured):**
-- Triggers when user provides a tech-spec path, or when ticket metadata contains `tech_spec_path` pointing to a ready-for-dev spec
-- Load the tech-spec, verify it has `status: 'ready-for-dev'`
-- Extract tasks and acceptance criteria
+- Triggers when user provides a tech-spec path, or when `{beads_active}` and ticket has `metadata.spec_status == "ready-for-dev"`
+- **From ticket:** Load spec from `design` (overview), `notes` (technical context), `acceptance_criteria` (ACs). List sub-tickets as implementation tasks: `bd list --parent {ticket_id} --json`.
+- **From file:** Load the tech-spec, verify it has `status: 'ready-for-dev'`, extract tasks and acceptance criteria.
 - **Skip to Phase 3: Execute**
 
 **Mode B — Direct Instructions (ad-hoc):**
@@ -87,7 +81,7 @@ If user chooses to escalate:
 
 If user chooses **[E] Execute directly** → Continue to Phase 2.
 
-### `[BEADS]` Phase 1 Sync
+### Phase 1 Sync
 If `{beads_active}`:
 1. `bd update {ticket_id} --status in_progress`
 2. Read-merge-write metadata: merge `{"bmad_phase": "dev", "bmad_step": "mode-detect", "baseline_commit": "{baseline_commit}", "execution_mode": "{mode_a_or_mode_b}"}`
@@ -126,7 +120,7 @@ Show files, patterns, plan, and acceptance criteria. Ask: "Ready to execute? Adj
 
 **Wait for user confirmation before proceeding.**
 
-### `[BEADS]` Phase 2 Sync (Mode B Only)
+### Phase 2 Sync (Mode B Only)
 If `{beads_active}`:
 1. `bd update {ticket_id} --notes "**Implementation Plan:**\n\n{task_list}\n\n**Files to modify:** {files_list}\n\n**Dependencies:** {dependencies}"`
 2. `bd update {ticket_id} --acceptance-criteria "{inferred_acceptance_criteria}"`
@@ -142,11 +136,12 @@ If `{beads_active}`:
 ### Execution Loop
 For each task in the plan/spec:
 
-1. **Load context** — Read relevant files, review patterns
-2. **Implement** — Write code following codebase patterns exactly
-3. **Test** — Red-green-refactor: write failing test → make it pass → refactor
-4. **Mark complete** — Check off task
-5. **Continue immediately** — Next task without pausing
+1. **Start task** — If `{beads_active}` and tasks are sub-tickets: `bd update {sub_id} --status in_progress`
+2. **Load context** — Read relevant files, review patterns
+3. **Implement** — Write code following codebase patterns exactly
+4. **Test** — Red-green-refactor: write failing test → make it pass → refactor
+5. **Mark complete** — Check off task. If `{beads_active}` and tasks are sub-tickets: `bd close {sub_id}`
+6. **Continue immediately** — Next task without pausing
 
 ### Critical Rules
 - **Continuous execution** — Do NOT stop between tasks for approval
@@ -163,7 +158,7 @@ ONLY halt for:
 
 Do NOT halt for minor warnings, optional improvements, or deprecation notices.
 
-### `[BEADS]` Phase 3 Sync
+### Phase 3 Sync
 If `{beads_active}` (after ALL tasks complete, not per-task):
 1. Read-merge-write metadata: merge `{"bmad_step": "execute"}`
 2. `bd comment {ticket_id} "BMAD quick-dev Phase 3 (Execute) complete — {completed_count}/{total_count} tasks implemented"`
@@ -198,19 +193,20 @@ Verify each item honestly:
 ### Handle Failures
 Fix immediately if possible. Re-run affected tests. If not fixable, document and flag for user.
 
-### Mode A: Update Tech-Spec
-Update status to "Implementation Complete", mark all tasks `[x]`, add implementation notes if approach deviated.
+### Update Spec Artifact
+
+**If `{beads_active}`:**
+- Read-merge-write metadata: merge `{"bmad_step": "self-check"}`
+- `bd comment {ticket_id} "BMAD quick-dev Phase 4 (Self-Check) complete — {pass_count}/12 checks passing, {new_test_count} new tests"`
+
+**Otherwise (Mode A with local tech-spec):**
+- Update status to "Implementation Complete", mark all tasks `[x]`, add implementation notes if approach deviated.
 
 ### Present Summary
 - Tasks completed: N/N
 - Tests: X new, Y total passing
 - Files modified/created
 - Checklist: all items passing (or flagged)
-
-### `[BEADS]` Phase 4 Sync
-If `{beads_active}`:
-1. Read-merge-write metadata: merge `{"bmad_step": "self-check"}`
-2. `bd comment {ticket_id} "BMAD quick-dev Phase 4 (Self-Check) complete — {pass_count}/12 checks passing, {new_test_count} new tests"`
 
 ---
 
@@ -231,7 +227,7 @@ Use a subagent (Task tool) for true information asymmetry. The reviewer sees ONL
 ### Process and Present Findings
 Number findings (F1, F2...) with severity and validity ratings. Order by severity. Flag zero findings as suspicious.
 
-### `[BEADS]` Phase 5 Sync
+### Phase 5 Sync
 If `{beads_active}`:
 1. Read-merge-write metadata: merge `{"bmad_step": "adversarial-review", "finding_count": {total_findings}}`
 2. `bd comment {ticket_id} "BMAD quick-dev Phase 5 (Adversarial Review) complete — {finding_count} findings ({critical_count} critical, {warning_count} warnings, {info_count} info)"`
@@ -250,8 +246,15 @@ If `{beads_active}`:
 - **Fix automatically:** Filter to "Real" only, apply, re-run all tests, report
 - **Skip:** Note findings for future reference
 
-### Mode A: Update Tech-Spec
-Update status to "Completed". Add review notes: finding count, fixed count, skipped count.
+### Update Spec Artifact
+
+**If `{beads_active}`:**
+1. Read-merge-write metadata: merge `{"bmad_phase": "done", "bmad_step": "resolve-findings", "findings_fixed": {fixed_count}, "findings_skipped": {skipped_count}, "spec_status": "completed"}`
+2. `bd comment {ticket_id} "BMAD quick-dev Phase 6 (Resolve Findings) complete — implementation done. {fixed_count} findings fixed, {skipped_count} skipped. All tests passing."`
+3. Ask user: "Implementation is complete. Close this ticket? (`bd close {ticket_id} --reason 'Implementation complete — {summary}'`)"
+
+**Otherwise (Mode A with local tech-spec):**
+- Update status to "Completed". Add review notes: finding count, fixed count, skipped count.
 
 ### Completion Summary
 - Files modified/created
@@ -260,9 +263,3 @@ Update status to "Completed". Add review notes: finding count, fixed count, skip
 - Status: Complete
 
 Suggest: commit, run additional tests, or start a new workflow.
-
-### `[BEADS]` Phase 6 Sync
-If `{beads_active}`:
-1. Read-merge-write metadata: merge `{"bmad_phase": "done", "bmad_step": "resolve-findings", "findings_fixed": {fixed_count}, "findings_skipped": {skipped_count}}`
-2. `bd comment {ticket_id} "BMAD quick-dev Phase 6 (Resolve Findings) complete — implementation done. {fixed_count} findings fixed, {skipped_count} skipped. All tests passing."`
-3. Ask user: "Implementation is complete. Close this ticket? (`bd close {ticket_id} --reason 'Implementation complete — {summary}'`)"
