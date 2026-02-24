@@ -9,6 +9,22 @@ Conversational spec engineering flow. Produces a ready-for-dev tech spec from a 
 
 **Persona:** Adopt the Barry (Solo Dev) persona from `bmad:bmad-personas` — read `quick-flow-solo-dev.md`. Direct, confident, implementation-focused, minimum ceremony.
 
+## Beads Integration (Optional)
+
+If `{ticket_id}` is set, this skill syncs progress to the beads issue alongside local files.
+
+### Detection
+1. Check if `{ticket_id}` is set (non-empty). If not, set `{beads_active}` to false and skip all `[BEADS]` steps.
+2. Verify beads is installed: `which bd`. If not found, warn user ("beads not installed, proceeding without ticket tracking"), set `{beads_active}` to false.
+3. Load ticket: `bd show {ticket_id} --json`. If the ticket doesn't exist, warn and set `{beads_active}` to false.
+4. Store the ticket's current `metadata` JSON for read-merge-write operations.
+
+### Metadata Read-Merge-Write Pattern
+Every `[BEADS]` metadata update must:
+1. Read current metadata: `bd show {ticket_id} --json` → extract `.metadata`
+2. Merge new fields into the existing object (never discard existing keys)
+3. Write full merged JSON: `bd update {ticket_id} --metadata '{...}'`
+
 ## Checklist
 
 Track progress using TodoWrite:
@@ -19,12 +35,16 @@ Track progress using TodoWrite:
 - [ ] Ask informed questions — code-anchored clarification questions
 - [ ] Capture core understanding — title, slug, problem, solution, scope
 - [ ] Initialize WIP file — create tech-spec-wip.md with Overview section
+- [ ] [BEADS] Phase 1 sync — status, design, metadata, comment
 - [ ] Deep code investigation — files, patterns, dependencies, tests
 - [ ] Confirm technical context — present findings to user
+- [ ] [BEADS] Phase 2 sync — notes, metadata, comment
 - [ ] Generate implementation tasks — discrete, dependency-ordered tasks with file paths
 - [ ] Generate acceptance criteria — Given/When/Then format with full coverage
 - [ ] Verify ready-for-dev standard — actionable, logical, testable, complete, self-contained
+- [ ] [BEADS] Phase 3 sync — acceptance_criteria, design, notes, metadata, comment
 - [ ] Human review gate — present spec, handle feedback, finalize
+- [ ] [BEADS] Phase 4 sync — metadata finalized, completion comment
 
 ---
 
@@ -36,8 +56,11 @@ Check if `_bmad-output/tech-spec-wip.md` exists:
 - **If continuing:** Load WIP, check `stepsCompleted` frontmatter, resume from next incomplete phase
 - **If archiving:** Rename to `tech-spec-wip-archived-{date}.md`, proceed fresh
 
+**`[BEADS]`** If `{beads_active}` and ticket has `metadata.bmad_phase == "spec"` and `metadata.bmad_step` is set, also offer to resume from the ticket's recorded step.
+
 ### Greet and Get Initial Request
-- "Hey! What are we building today?"
+- **`[BEADS]`** If `{beads_active}` and ticket has a title and description, use them as initial context: "I see ticket `{ticket_id}` — '{title}'. Let me use that as our starting point." Skip the open-ended question.
+- Otherwise: "Hey! What are we building today?"
 - Capture the user's feature/fix description
 - Note any constraints or preferences mentioned
 
@@ -67,6 +90,13 @@ Create `_bmad-output/tech-spec-wip.md` using the tech-spec template from `bmad:b
 - Fill frontmatter: title, slug, date, `status: 'in-progress'`, `stepsCompleted: [1]`
 - Fill Overview section: Problem Statement, Solution, Scope
 - Leave remaining sections for subsequent phases
+
+### `[BEADS]` Phase 1 Sync
+If `{beads_active}`:
+1. `bd update {ticket_id} --status in_progress`
+2. `bd update {ticket_id} --design "**Problem:** {problem_statement}\n\n**Solution:** {solution}\n\n**Scope:** {in_scope} / Out: {out_of_scope}"`
+3. Read-merge-write metadata: merge `{"bmad_phase": "spec", "bmad_step": "understand", "spec_slug": "{slug}"}`
+4. `bd comment {ticket_id} "BMAD quick-spec Phase 1 (Understand) complete — core understanding captured, WIP initialized"`
 
 ---
 
@@ -102,6 +132,12 @@ Present findings and ask: "Here's what I found — anything I'm missing?"
 - Update frontmatter: `tech_stack`, `files_to_modify`, `code_patterns`, `test_patterns`
 - Fill "Context for Development" section: Codebase Patterns, Files to Reference, Technical Decisions
 
+### `[BEADS]` Phase 2 Sync
+If `{beads_active}`:
+1. `bd update {ticket_id} --notes "**Technical Context:**\n\n**Files to modify:** {files_list}\n\n**Patterns:** {patterns_summary}\n\n**Dependencies:** {dependencies}"`
+2. Read-merge-write metadata: merge `{"bmad_step": "investigate"}`
+3. `bd comment {ticket_id} "BMAD quick-spec Phase 2 (Investigate) complete — deep code investigation done, {file_count} files mapped"`
+
 ---
 
 ## Phase 3: Generate
@@ -135,6 +171,14 @@ Write Given/When/Then criteria covering:
 - Fill all sections — no placeholders
 - Set `status: 'review'`, `stepsCompleted: [1, 2, 3]`
 
+### `[BEADS]` Phase 3 Sync
+If `{beads_active}`:
+1. `bd update {ticket_id} --acceptance-criteria "{given_when_then_criteria}"`
+2. `bd update {ticket_id} --design "**Problem:** {problem_statement}\n\n**Solution:** {solution}\n\n**Scope:** {in_scope} / Out: {out_of_scope}\n\n**Tasks:** {task_count} implementation tasks"`
+3. `bd update {ticket_id} --notes "**Technical Context:**\n\n{technical_context}\n\n**Task List:**\n{task_list_summary}"`
+4. Read-merge-write metadata: merge `{"bmad_step": "generate", "spec_status": "review"}`
+5. `bd comment {ticket_id} "BMAD quick-spec Phase 3 (Generate) complete — {task_count} tasks, {ac_count} acceptance criteria, spec in review"`
+
 ### Verify Ready-for-Dev Standard
 Before proceeding, the spec MUST pass ALL criteria:
 - **Actionable:** Every task has a clear file path and specific action
@@ -167,3 +211,8 @@ When user approves:
 2. Rename: `tech-spec-wip.md` → `tech-spec-{slug}.md`
 3. Confirm final path
 4. Suggest: "Spec is ready. Start development with `/quick-dev` using this spec."
+
+### `[BEADS]` Phase 4 Sync
+If `{beads_active}`:
+1. Read-merge-write metadata: merge `{"bmad_step": "review", "spec_status": "ready-for-dev", "tech_spec_path": "_bmad-output/tech-spec-{slug}.md"}`
+2. `bd comment {ticket_id} "BMAD quick-spec Phase 4 (Review) complete — spec finalized as ready-for-dev. Start implementation with /quick-dev {ticket_id}"`
