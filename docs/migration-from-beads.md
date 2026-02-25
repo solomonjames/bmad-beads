@@ -77,12 +77,3 @@ The full BMAD pipeline (phases 1-4) is still only available via beads formulas. 
 
 Beads formulas remain in the `formulas/` directory and the original step files remain in `skills/bmad/`. The `legacy/install.sh` script copies these into beads-enabled projects. Formula step descriptions now include `Plugin skill:` references alongside `Follow:` paths, so both models point to the same methodology.
 
-## Superpowers Integration
-
-The plugin model enables a new integration with superpowers. When both plugins are installed:
-
-- `bmad-quick-dev` delegates execution to `superpowers:test-driven-development`
-- `bmad-adversarial-review` complements `superpowers:verification-before-completion`
-- `bmad-complexity-assessment` can route to `superpowers:brainstorming` for design-heavy work
-
-This integration is automatic — BMAD skills reference superpowers skills, and if superpowers is installed, the agent uses them.

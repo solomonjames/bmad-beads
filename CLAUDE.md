@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-BMAD-Beads is a Claude Code plugin that implements the BMAD (Business-driven Multi-Agent Development) methodology. It provides structured product development with agent personas, complexity routing, spec engineering, and adversarial review. It complements execution-focused plugins like superpowers by adding methodology skills.
+BMAD-Beads is a Claude Code plugin that implements the BMAD (Business-driven Multi-Agent Development) methodology. It provides structured product development with agent personas, complexity routing, spec engineering, adversarial review, and execution skills (TDD, debugging, verification, parallel agents, worktrees).
 
 This is **not** a code library — it is a plugin/workflow system with no build step, no tests, and no package manager.
 
@@ -24,6 +24,10 @@ This is **not** a code library — it is a plugin/workflow system with no build 
 - `skills/bmad-tdd/` — Test-driven development methodology (Red-Green-Refactor), embedded in quick-dev
 - `skills/bmad-spec-engineering/` — Given/When/Then format, ready-for-dev standards
 - `skills/bmad-adversarial-review/` — Information-asymmetric code review + reviewer prompt
+- `skills/bmad-debugging/` — Systematic debugging: 4-phase root cause methodology + 3 supporting docs
+- `skills/bmad-verification/` — Verification before completion: 5-step gate function
+- `skills/bmad-parallel-agents/` — Parallel agent dispatch and integration
+- `skills/bmad-worktrees/` — Git worktree creation with ticket-based branch naming
 - `skills/bmad-personas/` — 8 expert persona files + index
 - `skills/bmad-artifact-templates/` — 8 output templates + index
 
@@ -47,7 +51,7 @@ Each plugin skill is a single `SKILL.md` file with:
 - **YAML frontmatter:** `name` and `description` (used for skill discovery and auto-triggering)
 - **Checklist:** Items tracked via TodoWrite during execution
 - **Phases:** Logical groupings of work within the skill
-- **Sub-skill references:** `bmad:skill-name` for other BMAD skills, `superpowers:skill-name` for superpowers skills
+- **Sub-skill references:** `bmad:skill-name` for other BMAD skills
 
 ### Naming Convention
 All skills are prefixed `bmad-` to avoid collisions. Invoked as `bmad:bmad-quick-spec` (plugin:skill format).
@@ -57,14 +61,15 @@ Skills reference personas by saying "Adopt the Barry persona from `bmad:bmad-per
 
 ## Key Patterns
 
-- **Soft dependencies on superpowers:** Skills say `**REQUIRED SUB-SKILL:** Use superpowers:test-driven-development`. If superpowers isn't installed, the agent falls back gracefully.
 - **Information asymmetry in reviews:** Adversarial review uses a subagent that sees ONLY the diff, not the spec or conversation.
 - **Human gates:** Flow skills pause for human approval at key points (spec review, finding resolution).
 - **WIP lifecycle:** Tech specs track progress via `stepsCompleted` in YAML frontmatter and transition through statuses: `in-progress` → `review` → `ready-for-dev` → `completed`.
+- **Worktree-ticket binding:** When beads is active, worktrees use `feature/{ticket_id}` branch naming to bind isolation to the tracking ticket.
+- **Supporting docs:** Some skills (e.g., `bmad-debugging`) have supporting markdown files alongside SKILL.md. These are referenced by relative path within the skill, not as separate skills.
 
 ## Editing Guidelines
 
-- **Plugin skills** (`skills/bmad-*/SKILL.md`): Single file per skill with YAML frontmatter. Follow superpowers' writing-skills guidance for length and structure.
+- **Plugin skills** (`skills/bmad-*/SKILL.md`): Single file per skill with YAML frontmatter. Keep skills focused — one concept per file, practical over theoretical.
 - **Commands** (`commands/*.md`): Lightweight wrappers with YAML frontmatter (`description`, `disable-model-invocation: true`) that invoke a skill.
 - **Hooks** (`hooks/`): SessionStart injects meta-skill content. Uses JSON output compatible with both Cursor and Claude Code.
 - **Personas** (`skills/bmad-personas/*.md`): Define Identity, Communication Style, Core Principles, Activation Triggers.

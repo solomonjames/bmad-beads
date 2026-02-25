@@ -2,7 +2,7 @@
 
 BMAD (Business-driven Multi-Agent Development) methodology as a **Claude Code plugin**. Adds structured product development — personas, complexity routing, spec engineering, adversarial review — on top of your existing development workflow.
 
-Works standalone or paired with [superpowers](https://github.com/obra/superpowers) for execution skills (TDD, debugging, worktrees).
+Self-contained methodology with built-in execution skills (TDD, debugging, verification, parallel agents, worktrees).
 
 ## Install
 
@@ -60,22 +60,6 @@ BMAD provides **methodology skills** that structure how you approach development
 5. **Adversarial review** — Code review with information asymmetry (reviewer sees only the diff)
 6. **Finding resolution** — Walk through, auto-fix, or skip findings with human approval
 
-### Superpowers Integration
-
-BMAD complements superpowers — it decides **what** to build, superpowers decides **how**:
-
-| BMAD | Superpowers |
-|------|-------------|
-| Complexity routing | — |
-| Spec engineering | — |
-| Personas | — |
-| — | TDD (red-green-refactor) |
-| — | Systematic debugging |
-| — | Git worktrees |
-| Adversarial review | Verification before completion |
-
-If superpowers isn't installed, BMAD skills still work — they just won't delegate to superpowers execution skills.
-
 ## Skills Reference
 
 ### Flow Skills
@@ -90,6 +74,11 @@ If superpowers isn't installed, BMAD skills still work — they just won't deleg
 
 | Skill | Description |
 |-------|-------------|
+| `bmad-tdd` | Test-driven development (Red-Green-Refactor), built into quick-dev |
+| `bmad-debugging` | Systematic debugging: 4-phase root cause methodology |
+| `bmad-verification` | Verification before completion: 5-step gate function |
+| `bmad-parallel-agents` | Parallel agent dispatch and integration |
+| `bmad-worktrees` | Git worktree creation with ticket-based branch naming |
 | `bmad-spec-engineering` | Given/When/Then format, task format, ready-for-dev standards |
 | `bmad-adversarial-review` | Information-asymmetric code review via subagents |
 

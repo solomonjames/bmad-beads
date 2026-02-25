@@ -38,9 +38,11 @@ Track progress using TodoWrite:
 
 - [ ] Capture baseline commit
 - [ ] Detect execution mode — tech-spec vs. direct (or ticket-driven if beads-active)
+- [ ] Create worktree (if beads-active or user opts in)
 - [ ] Gather context and confirm plan (Mode B only)
 - [ ] Execute implementation — all tasks continuous, track via sub-tickets if beads-active
 - [ ] Run 12-point self-check
+- [ ] Run verification gate — fresh evidence for all completion claims
 - [ ] Adversarial review with information asymmetry
 - [ ] Human review gate — resolve findings
 - [ ] Completion summary — update ticket or local spec, close sub-tickets
@@ -81,6 +83,12 @@ If user chooses to escalate:
 - **[W] Full BMAD** → Guide to appropriate phase formula
 
 If user chooses **[E] Execute directly** → Continue to Phase 2.
+
+### Create Worktree
+
+**If `{beads_active}`:** Auto-create a worktree via `bmad:bmad-worktrees`. Branch name: `feature/{ticket_id}` (or `feature/{ticket_id}-{spec_slug}` if metadata has `spec_slug`). Re-capture `baseline_commit` from the worktree HEAD.
+
+**If not beads-active:** Offer worktree creation as an option. If accepted, follow `bmad:bmad-worktrees` with kebab-case branch naming. Re-capture `baseline_commit` from worktree HEAD.
 
 ### Phase 1 Sync
 If `{beads_active}`:
@@ -153,12 +161,18 @@ For each task in the plan/spec:
 - **Follow patterns** — Match existing codebase conventions exactly
 - **No gold-plating** — Implement exactly what's specified, nothing more
 
+### Parallel Execution (Optional)
+
+When the task list contains 2+ independent tasks (different files, no shared state), MAY dispatch via `bmad:bmad-parallel-agents`. After all parallel agents complete, verify results with `bmad:bmad-verification`.
+
 ### Halt Conditions
 ONLY halt for:
 - 3 consecutive failures on the same task
 - Tests failing with no obvious fix
 - Blocking dependency (missing package, API, etc.)
 - Ambiguity requiring user decision
+
+When halted, follow `bmad:bmad-debugging` before attempting more fixes. Do NOT guess.
 
 Do NOT halt for minor warnings, optional improvements, or deprecation notices.
 
@@ -193,6 +207,12 @@ Verify each item honestly:
 **Patterns:**
 11. Code follows existing codebase conventions
 12. No code smells introduced (duplication, god objects, deep nesting)
+
+### Verification Gate
+
+**REQUIRED:** Invoke `bmad:bmad-verification` gate function. Run the full test suite, linter, and build fresh. Read complete output. Match evidence to every claim from the 12-point audit above.
+
+Any claim without fresh evidence? Go back and gather it.
 
 ### Handle Failures
 Fix immediately if possible. Re-run affected tests. If not fixable, document and flag for user.
@@ -249,6 +269,20 @@ If `{beads_active}`:
 - **Walk through:** Per-finding decision with test re-runs after fixes
 - **Fix automatically:** Filter to "Real" only, apply, re-run all tests, report
 - **Skip:** Note findings for future reference
+
+### Final Verification
+
+**REQUIRED:** Run `bmad:bmad-verification` gate function one last time. This catches regressions introduced during finding resolution.
+
+### Worktree Completion
+
+If in a worktree, present completion options via `bmad:bmad-worktrees`:
+- **[P] Create Pull Request** — push branch and create PR
+- **[M] Merge to main** — merge branch and clean up worktree
+- **[K] Keep for later** — leave worktree in place
+- **[D] Discard** — remove worktree and branch
+
+**Wait for user decision.**
 
 ### Update Spec Artifact
 

@@ -5,12 +5,13 @@ description: Use when starting any conversation - establishes when to use BMAD m
 
 # Using BMAD
 
-BMAD (Business-driven Multi-Agent Development) provides **methodology skills** for structured product development. It complements execution skills (like superpowers' TDD, debugging, worktrees) by adding:
+BMAD (Business-driven Multi-Agent Development) provides a complete methodology for structured product development — from planning through execution to review. It includes:
 
 - **Personas** — Expert viewpoints for different phases of work
 - **Complexity routing** — Match approach depth to problem complexity
 - **Spec engineering** — Structured Given/When/Then specifications with ready-for-dev standards
 - **Adversarial review** — Information-asymmetric code review using subagents
+- **Execution skills** — TDD, debugging, verification, parallel agents, worktrees
 
 ## When to Use BMAD Skills
 
@@ -20,13 +21,17 @@ BMAD (Business-driven Multi-Agent Development) provides **methodology skills** f
 | Feature needs a spec before coding | `bmad:bmad-quick-spec` | — |
 | Ready to implement (with or without spec) | `bmad:bmad-quick-dev` | TDD built-in (`bmad:bmad-tdd`) |
 | Writing acceptance criteria | `bmad:bmad-spec-engineering` | — |
-| Implementation complete, need review | `bmad:bmad-adversarial-review` | `superpowers:verification-before-completion` |
+| Bug needs investigation | `bmad:bmad-debugging` | `bmad:bmad-tdd` |
+| Claiming work is complete | `bmad:bmad-verification` | — |
+| 2+ independent tasks | `bmad:bmad-parallel-agents` | — |
+| Starting isolated work on a ticket | `bmad:bmad-worktrees` | Built into quick-dev |
+| Implementation complete, need review | `bmad:bmad-adversarial-review` | `bmad:bmad-verification` |
 | Need a specific expert perspective | `bmad:bmad-personas` | — |
 | Need an output template (tech-spec, PRD, etc.) | `bmad:bmad-artifact-templates` | — |
 
 ## When NOT to Use BMAD Skills
 
-- **Simple bug fixes** — Go straight to debugging/TDD
+- **Simple bug fixes with obvious cause** — Go straight to TDD. If cause is NOT obvious, use `bmad:bmad-debugging`
 - **One-line changes** — Just do it
 - **Exploration/research** — Use exploration tools directly
 - **Refactoring with no behavior change** — Execution skills suffice
@@ -71,6 +76,10 @@ bd close bd-abc123                          # done
 
 ### Methodology Skills (invoked by flow skills or standalone)
 - **`bmad-tdd`** — Test-driven development: Iron Law, Red-Green-Refactor cycle, rationalizations, red flags. Built into quick-dev's execution loop.
+- **`bmad-debugging`** — Systematic debugging: 4-phase root cause methodology (investigate → analyze → hypothesize → implement). Activated by quick-dev halt conditions. Includes 3 supporting docs (root-cause-tracing, defense-in-depth, condition-based-waiting).
+- **`bmad-verification`** — Verification before completion: 5-step gate function requiring fresh evidence for every completion claim. Invoked at quick-dev Phases 4 and 6.
+- **`bmad-parallel-agents`** — Parallel agent dispatch: identify independent domains, craft focused prompts, dispatch via Task tool, review and integrate. Optional in quick-dev Phase 3.
+- **`bmad-worktrees`** — Git worktree creation with ticket-based branch naming. Auto-creates worktrees for beads tickets. Invoked at quick-dev Phases 1 and 6.
 - **`bmad-spec-engineering`** — Given/When/Then acceptance criteria format and ready-for-dev standards.
 - **`bmad-adversarial-review`** — Code review with information asymmetry using subagents.
 
@@ -84,12 +93,6 @@ bd close bd-abc123                          # done
 - **`/quick-dev [ticket-id]`** — Start the quick-dev flow (optionally against a beads ticket)
 - **`/assess-complexity`** — Run complexity assessment
 
-## Interaction with Superpowers
+## Self-Contained Methodology
 
-BMAD is designed to complement superpowers, not replace it. The pattern:
-
-1. **BMAD decides WHAT to build** (spec engineering, complexity routing, personas)
-2. **BMAD drives HOW to build** (TDD is built into quick-dev via `bmad:bmad-tdd`)
-3. **BMAD reviews the result** (adversarial review)
-
-Superpowers execution skills (debugging, worktrees, plans) remain complementary when installed. TDD no longer depends on superpowers — it's embedded directly in the quick-dev execution loop.
+BMAD owns all its methodology and execution skills — from planning (spec engineering, complexity routing) through execution (TDD, debugging, verification, parallel agents, worktrees) to review (adversarial review). No external plugin dependencies are required.
