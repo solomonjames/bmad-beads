@@ -37,7 +37,6 @@ Every metadata update must:
 Track progress using TodoWrite:
 
 - [ ] Capture baseline commit
-- [ ] Detect available sub-skills — check for superpowers:test-driven-development
 - [ ] Detect execution mode — tech-spec vs. direct (or ticket-driven if beads-active)
 - [ ] Gather context and confirm plan (Mode B only)
 - [ ] Execute implementation — all tasks continuous, track via sub-tickets if beads-active
@@ -58,11 +57,6 @@ Store as `baseline_commit`. If not in a git repo, set to "NO_GIT".
 
 ### Load Project Context
 Read `project-context.md` if it exists. Note project conventions, patterns, constraints.
-
-### Detect Available Sub-Skills
-Check the available skills listed in system messages:
-- **`superpowers:test-driven-development`** → set `{tdd_available}` to true if listed. This skill will drive the execution loop in Phase 3.
-- If not listed, set `{tdd_available}` to false. Execution proceeds with the built-in flow.
 
 ### Determine Execution Mode
 
@@ -138,26 +132,25 @@ If `{beads_active}`:
 
 ## Phase 3: Execute
 
-### Activate TDD Sub-Skill
-If `{tdd_available}`: **invoke `superpowers:test-driven-development` via the Skill tool NOW**, before starting the execution loop. This loads TDD methodology that governs every task below with red-green-refactor discipline.
+**METHODOLOGY:** This phase follows TDD (test-driven development). Read `bmad:bmad-tdd` for the full methodology, rationalizations table, and red flags. The core rule: **no production code without a failing test first.**
 
-If superpowers is not installed, proceed with the built-in execution loop.
+**Exception:** If the project has no test framework or the task is configuration-only, skip TDD steps (3-5) and implement directly. Note the exception in the phase sync comment.
 
 ### Execution Loop
 For each task in the plan/spec:
 
 1. **Start task** — If `{beads_active}` and tasks are sub-tickets: `bd update {sub_id} --status in_progress`
-2. **Load context** — Read relevant files, review patterns
-3. **Write failing test FIRST** (if `{tdd_available}`) — Follow the TDD skill's red-green-refactor cycle: write a failing test that captures expected behavior before writing any implementation code
-4. **Implement** — Write code following codebase patterns exactly. If TDD active, make the failing test pass.
-5. **Refactor** — Clean up while keeping tests green
+2. **Load context** — Read relevant files, review patterns, identify test file locations and testing conventions
+3. **RED — Write failing test** — Write one minimal test capturing the expected behavior. Run it. Confirm it **fails** because the feature is missing (not because of errors or typos). If it passes immediately, you're testing existing behavior — fix the test.
+4. **GREEN — Minimal implementation** — Write the simplest code to make the failing test pass. Run all tests. Confirm everything is green.
+5. **REFACTOR** — Clean up while keeping tests green. Remove duplication, improve names. Do not add behavior.
 6. **Mark complete** — Check off task. If `{beads_active}` and tasks are sub-tickets: `bd close {sub_id}`
 7. **Continue immediately** — Next task without pausing
 
 ### Critical Rules
+- **Test first** — Every behavioral change starts with a failing test. No exceptions without user approval. See `bmad:bmad-tdd` for the full Iron Law.
 - **Continuous execution** — Do NOT stop between tasks for approval
 - **Follow patterns** — Match existing codebase conventions exactly
-- **Tests are non-negotiable** — Every behavioral change gets a test
 - **No gold-plating** — Implement exactly what's specified, nothing more
 
 ### Halt Conditions

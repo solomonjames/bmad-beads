@@ -18,7 +18,7 @@ BMAD (Business-driven Multi-Agent Development) provides **methodology skills** f
 |-----------|-----------|------------|
 | User describes a feature or asks "build X" | `bmad:bmad-complexity-assessment` | — |
 | Feature needs a spec before coding | `bmad:bmad-quick-spec` | — |
-| Ready to implement (with or without spec) | `bmad:bmad-quick-dev` | `superpowers:test-driven-development` |
+| Ready to implement (with or without spec) | `bmad:bmad-quick-dev` | TDD built-in (`bmad:bmad-tdd`) |
 | Writing acceptance criteria | `bmad:bmad-spec-engineering` | — |
 | Implementation complete, need review | `bmad:bmad-adversarial-review` | `superpowers:verification-before-completion` |
 | Need a specific expert perspective | `bmad:bmad-personas` | — |
@@ -70,6 +70,7 @@ bd close bd-abc123                          # done
 - **`bmad-complexity-assessment`** — Evaluate complexity signals and route to the right depth of planning.
 
 ### Methodology Skills (invoked by flow skills or standalone)
+- **`bmad-tdd`** — Test-driven development: Iron Law, Red-Green-Refactor cycle, rationalizations, red flags. Built into quick-dev's execution loop.
 - **`bmad-spec-engineering`** — Given/When/Then acceptance criteria format and ready-for-dev standards.
 - **`bmad-adversarial-review`** — Code review with information asymmetry using subagents.
 
@@ -88,7 +89,7 @@ bd close bd-abc123                          # done
 BMAD is designed to complement superpowers, not replace it. The pattern:
 
 1. **BMAD decides WHAT to build** (spec engineering, complexity routing, personas)
-2. **Superpowers decides HOW to build** (TDD, debugging, worktrees, plans)
+2. **BMAD drives HOW to build** (TDD is built into quick-dev via `bmad:bmad-tdd`)
 3. **BMAD reviews the result** (adversarial review)
 
-If superpowers is not installed, BMAD skills still work — they just won't delegate to superpowers execution skills.
+Superpowers execution skills (debugging, worktrees, plans) remain complementary when installed. TDD no longer depends on superpowers — it's embedded directly in the quick-dev execution loop.

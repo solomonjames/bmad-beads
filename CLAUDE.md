@@ -21,6 +21,7 @@ This is **not** a code library — it is a plugin/workflow system with no build 
 - `skills/bmad-quick-spec/` — Merged 4-phase spec engineering flow
 - `skills/bmad-quick-dev/` — Merged 6-phase implementation flow + adversarial reviewer prompt
 - `skills/bmad-complexity-assessment/` — Complexity signal evaluation and routing
+- `skills/bmad-tdd/` — Test-driven development methodology (Red-Green-Refactor), embedded in quick-dev
 - `skills/bmad-spec-engineering/` — Given/When/Then format, ready-for-dev standards
 - `skills/bmad-adversarial-review/` — Information-asymmetric code review + reviewer prompt
 - `skills/bmad-personas/` — 8 expert persona files + index
