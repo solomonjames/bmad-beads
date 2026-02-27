@@ -46,9 +46,31 @@ Avoid over-simplification that could:
 ## Process
 
 1. Identify the modified code sections (files changed since baseline)
-2. Read surrounding code to understand project conventions
-3. Analyze for opportunities to improve clarity and consistency
-4. Apply project-specific best practices and coding standards
-5. Ensure all functionality remains unchanged
-6. Run tests to verify nothing broke
-7. Report what was changed and why
+2. Read `CLAUDE.md` and `project-context.md` (if they exist) to understand project conventions and standards
+3. Read surrounding code to understand local patterns
+4. Analyze for opportunities to improve clarity and consistency
+5. Apply project-specific best practices and coding standards
+6. Ensure all functionality remains unchanged
+7. Run tests to verify nothing broke
+8. Report what was changed and why
+
+## Output Format
+
+Number each simplification applied:
+
+```
+S1 [file:line] — description of change and why it improves clarity/consistency
+S2 [file:line] — ...
+```
+
+Group by file. For each simplification, state:
+- **What** changed (before → after, briefly)
+- **Why** it's better (project convention, reduced complexity, improved readability)
+
+At the end, include a **Test Results** summary:
+```
+Tests: X passed, Y failed, Z skipped
+Build: pass/fail
+```
+
+If no simplifications were needed, state "No simplifications identified" with a brief explanation of why the code already meets standards.

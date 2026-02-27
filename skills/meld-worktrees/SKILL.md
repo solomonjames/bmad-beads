@@ -137,7 +137,7 @@ Key reminders:
 
 ## Completion
 
-When work is done (quick-dev Phase 6), present these options:
+When work is done (quick-dev Phase 7), present these options:
 
 ### Option 1: Create Pull Request
 
@@ -178,6 +178,6 @@ This skill is invoked at two points in `meld:meld-quick-dev`:
    - If not: offer worktree as an option
    - Re-capture baseline commit from worktree HEAD
 
-2. **Phase 6 (Resolve Findings)** — Before "Update Spec Artifact":
+2. **Phase 7 (Resolve Findings)** — Before "Update Spec Artifact":
    - If in a worktree, present completion options (PR/Merge/Keep/Discard)
    - User decides what to do with the worktree

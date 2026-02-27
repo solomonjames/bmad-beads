@@ -67,7 +67,7 @@ MELD provides **methodology skills** that structure how you approach development
 | Skill | Command | Description |
 |-------|---------|-------------|
 | `meld-quick-spec` | `/quick-spec` | 4-phase spec engineering: understand, investigate, generate, review |
-| `meld-quick-dev` | `/quick-dev` | 6-phase implementation: mode detect, context, execute, self-check, review, resolve |
+| `meld-quick-dev` | `/quick-dev` | 7-phase implementation: mode detect, context, execute, code simplify, self-check, review, resolve |
 | `meld-complexity-assessment` | `/assess-complexity` | Complexity signals → routing to right depth |
 
 ### Methodology Skills

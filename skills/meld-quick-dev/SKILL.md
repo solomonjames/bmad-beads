@@ -1,11 +1,11 @@
 ---
 name: meld-quick-dev
-description: Use when ready to implement a feature — flexible implementation flow with mode detection, execution, self-check, adversarial review, and finding resolution
+description: Use when ready to implement a feature — 7-phase implementation flow with mode detection, execution, code simplification, self-check, adversarial review, and finding resolution
 ---
 
 # Quick Dev
 
-Implementation flow that handles both spec-driven (Mode A) and direct instruction (Mode B) development. Includes execution, self-check, adversarial review, and finding resolution.
+Implementation flow that handles both spec-driven (Mode A) and direct instruction (Mode B) development. Includes execution, code simplification, self-check, adversarial review, and finding resolution.
 
 **Persona:** Adopt the Barry (Solo Dev) persona from `meld:meld-personas` — read `quick-flow-solo-dev.md`. Direct, confident, ruthless efficiency.
 
@@ -41,6 +41,7 @@ Track progress using TodoWrite:
 - [ ] Create worktree (if beads-active or user opts in)
 - [ ] Gather context and confirm plan (Mode B only)
 - [ ] Execute implementation — all tasks continuous, track via sub-tickets if beads-active
+- [ ] Code simplification pass — subagent reviews modified code for clarity and consistency
 - [ ] Run 12-point self-check
 - [ ] Run verification gate — fresh evidence for all completion claims
 - [ ] Adversarial review with information asymmetry
@@ -183,7 +184,45 @@ If `{beads_active}` (after ALL tasks complete, not per-task):
 
 ---
 
-## Phase 4: Self-Check
+## Phase 4: Code Simplification
+
+A fresh-context subagent reviews all modified code for clarity, consistency, and maintainability — catching blind spots the implementing agent misses.
+
+### Skip Conditions
+Skip this phase if EITHER condition is true:
+- **Trivial diff:** fewer than 20 lines changed AND fewer than 3 files modified (check via `git diff --stat {baseline_commit}`)
+- **No test framework:** the project has no test runner (same exception as TDD in Phase 3)
+
+If skipping, note the reason in the phase sync comment and proceed to Phase 5.
+
+### Identify Modified Files
+```bash
+git diff --name-only {baseline_commit}
+```
+Store the file list for the subagent prompt.
+
+### Invoke Code Simplifier Subagent
+Use the Task tool to dispatch a `code-simplifier` subagent with:
+- **Prompt:** Read `meld:meld-code-simplifier` SKILL.md content, then: "Simplify code modified since `{baseline_commit}`. Files: `{file_list}`. Read `CLAUDE.md` and `project-context.md` first for project conventions."
+- **Context:** The subagent receives ONLY the SKILL.md instructions, baseline commit, and file list — NO conversation history. This gives it fresh eyes on the code.
+
+### Review Simplifier Output
+Review each simplification (S1, S2...) from the subagent:
+- **Accept** changes that genuinely improve clarity or consistency
+- **Revert** any change that alters behavior, is questionable, or reduces readability
+- Use your judgement — the simplifier is advisory, not authoritative
+
+### Verify Tests Still Pass
+Run the full test suite after applying simplifications. If any test fails, revert the offending simplification and re-run.
+
+### Phase 4 Sync
+If `{beads_active}`:
+1. Read-merge-write metadata: merge `{"meld_step": "code-simplify"}`
+2. `bd comment {ticket_id} "MELD quick-dev Phase 4 (Code Simplification) complete — {accepted_count} simplifications accepted, {reverted_count} reverted"`
+
+---
+
+## Phase 5: Self-Check
 
 ### 12-Point Self-Audit
 Verify each item honestly:
@@ -221,7 +260,7 @@ Fix immediately if possible. Re-run affected tests. If not fixable, document and
 
 **If `{beads_active}`:**
 - Read-merge-write metadata: merge `{"meld_step": "self-check"}`
-- `bd comment {ticket_id} "MELD quick-dev Phase 4 (Self-Check) complete — {pass_count}/12 checks passing, {new_test_count} new tests"`
+- `bd comment {ticket_id} "MELD quick-dev Phase 5 (Self-Check) complete — {pass_count}/12 checks passing, {new_test_count} new tests"`
 
 **Otherwise (Mode A with local tech-spec):**
 - Update status to "Implementation Complete", mark all tasks `[x]`, add implementation notes if approach deviated.
@@ -234,7 +273,7 @@ Fix immediately if possible. Re-run affected tests. If not fixable, document and
 
 ---
 
-## Phase 5: Adversarial Review
+## Phase 6: Adversarial Review
 
 **REQUIRED SUB-SKILL:** Use `meld:meld-adversarial-review` for the full review procedure.
 
@@ -251,14 +290,14 @@ Use a subagent (Task tool) for true information asymmetry. The reviewer sees ONL
 ### Process and Present Findings
 Number findings (F1, F2...) with severity and validity ratings. Order by severity. Flag zero findings as suspicious.
 
-### Phase 5 Sync
+### Phase 6 Sync
 If `{beads_active}`:
 1. Read-merge-write metadata: merge `{"meld_step": "adversarial-review", "finding_count": {total_findings}}`
-2. `bd comment {ticket_id} "MELD quick-dev Phase 5 (Adversarial Review) complete — {finding_count} findings ({critical_count} critical, {warning_count} warnings, {info_count} info)"`
+2. `bd comment {ticket_id} "MELD quick-dev Phase 6 (Adversarial Review) complete — {finding_count} findings ({critical_count} critical, {warning_count} warnings, {info_count} info)"`
 
 ---
 
-## Phase 6: Resolve Findings (Human Gate)
+## Phase 7: Resolve Findings (Human Gate)
 
 ### Present Options
 - **[W] Walk through** — Iterate each finding: Fix / Skip / Discuss
@@ -288,7 +327,7 @@ If in a worktree, present completion options via `meld:meld-worktrees`:
 
 **If `{beads_active}`:**
 1. Read-merge-write metadata: merge `{"meld_phase": "done", "meld_step": "resolve-findings", "findings_fixed": {fixed_count}, "findings_skipped": {skipped_count}, "spec_status": "completed"}`
-2. `bd comment {ticket_id} "MELD quick-dev Phase 6 (Resolve Findings) complete — implementation done. {fixed_count} findings fixed, {skipped_count} skipped. All tests passing."`
+2. `bd comment {ticket_id} "MELD quick-dev Phase 7 (Resolve Findings) complete — implementation done. {fixed_count} findings fixed, {skipped_count} skipped. All tests passing."`
 3. Ask user: "Implementation is complete. Close this ticket? (`bd close {ticket_id} --reason 'Implementation complete — {summary}'`)"
 
 **Otherwise (Mode A with local tech-spec):**
