@@ -17,29 +17,29 @@ TARGET="$(cd "$TARGET" 2>/dev/null && pwd)" || {
   exit 1
 }
 
-echo "Uninstalling BMAD-Beads from: $TARGET"
+echo "Uninstalling MELD from: $TARGET"
 
-# Remove BMAD formula files (regular files or symlinks)
+# Remove MELD formula files (regular files or symlinks)
 REMOVED_FORMULAS=0
-for f in "$TARGET/.beads/formulas/"bmad-*.formula.toml; do
+for f in "$TARGET/.beads/formulas/"meld-*.formula.toml; do
   if [[ -f "$f" || -L "$f" ]]; then
     rm "$f"
     REMOVED_FORMULAS=$((REMOVED_FORMULAS + 1))
   fi
 done
 
-# Remove BMAD skills directory (regular directory or symlink)
-if [[ -d "$TARGET/.beads/skills/bmad" || -L "$TARGET/.beads/skills/bmad" ]]; then
-  rm -rf "$TARGET/.beads/skills/bmad"
-  echo "  Removed .beads/skills/bmad/"
+# Remove MELD skills directory (regular directory or symlink)
+if [[ -d "$TARGET/.beads/skills/meld" || -L "$TARGET/.beads/skills/meld" ]]; then
+  rm -rf "$TARGET/.beads/skills/meld"
+  echo "  Removed .beads/skills/meld/"
 fi
 
 # Remove version file
-if [[ -f "$TARGET/.bmad-beads-version" ]]; then
-  rm "$TARGET/.bmad-beads-version"
+if [[ -f "$TARGET/.meld-version" ]]; then
+  rm "$TARGET/.meld-version"
 fi
 
 echo ""
-echo "BMAD-Beads uninstalled."
+echo "MELD uninstalled."
 echo "  Formulas removed: $REMOVED_FORMULAS"
 echo "  Skills directory:  removed"

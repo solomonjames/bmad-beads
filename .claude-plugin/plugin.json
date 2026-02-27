@@ -1,13 +1,13 @@
 {
-  "name": "bmad",
-  "description": "BMAD methodology for Claude Code: personas, complexity routing, spec engineering, adversarial review, and structured product development",
+  "name": "meld",
+  "description": "MELD methodology for Claude Code: personas, complexity routing, spec engineering, adversarial review, and structured product development",
   "version": "1.0.0",
   "author": {
     "name": "James Solomon",
     "email": "james@solomonjames.com"
   },
-  "homepage": "https://github.com/solomonjames/bmad-beads",
-  "repository": "https://github.com/solomonjames/bmad-beads",
+  "homepage": "https://github.com/solomonjames/meld",
+  "repository": "https://github.com/solomonjames/meld",
   "license": "MIT",
-  "keywords": ["bmad", "methodology", "spec-engineering", "personas", "adversarial-review", "product-development"]
+  "keywords": ["meld", "methodology", "spec-engineering", "personas", "adversarial-review", "product-development"]
 }

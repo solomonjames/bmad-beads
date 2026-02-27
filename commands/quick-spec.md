@@ -5,4 +5,4 @@ disable-model-invocation: true
 
 If the user provided a ticket ID argument (e.g., `bd-abc123`), set `{ticket_id}` to that value. Otherwise leave `{ticket_id}` empty.
 
-Invoke the bmad:bmad-quick-spec skill and follow it exactly as presented to you
+Invoke the meld:meld-quick-spec skill and follow it exactly as presented to you

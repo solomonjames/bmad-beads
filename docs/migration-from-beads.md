@@ -1,18 +1,18 @@
 # Migrating from Beads to Plugin Model
 
-This guide helps existing bmad-beads users transition from the beads formula model to the Claude Code plugin model.
+This guide helps existing meld users transition from the beads formula model to the Claude Code plugin model.
 
 ## What Changed
 
 | Before (Beads) | After (Plugin) |
 |----------------|----------------|
-| `./install.sh /path/to/project` | `/plugin install bmad` |
-| `bd mol pour bmad-quick-spec --var ...` | `/quick-spec` |
-| `bd mol pour bmad-quick-dev --var ...` | `/quick-dev` |
+| `./install.sh /path/to/project` | `/plugin install meld` |
+| `bd mol pour meld-quick-spec --var ...` | `/quick-spec` |
+| `bd mol pour meld-quick-dev --var ...` | `/quick-dev` |
 | Steps create beads issues | Skills track progress via TodoWrite |
 | `bd ready` / `bd close` to navigate | Agent auto-progresses through phases |
 | Variables via `--var` flags | State tracked in conversation context |
-| Skills at `.beads/skills/bmad/` | Skills at plugin `skills/` directory |
+| Skills at `.beads/skills/meld/` | Skills at plugin `skills/` directory |
 
 ## What Stays the Same
 
@@ -27,20 +27,20 @@ This guide helps existing bmad-beads users transition from the beads formula mod
 ### 1. Install the Plugin
 
 ```bash
-# If you cloned bmad-beads locally:
-/plugin marketplace add /path/to/bmad-beads
-/plugin install bmad
+# If you cloned meld locally:
+/plugin marketplace add /path/to/meld
+/plugin install meld
 
 # Or from the remote marketplace:
-/plugin marketplace add https://github.com/solomonjames/bmad-beads
-/plugin install bmad
+/plugin marketplace add https://github.com/solomonjames/meld
+/plugin install meld
 ```
 
 ### 2. Use Slash Commands Instead of Formulas
 
 **Before:**
 ```bash
-bd mol pour bmad-quick-spec --var project_name="MyApp" --var feature="Add avatar upload"
+bd mol pour meld-quick-spec --var project_name="MyApp" --var feature="Add avatar upload"
 bd ready
 bd show understand
 bd update understand --status=in_progress
@@ -62,11 +62,11 @@ bd ready
 - **No more formula pouring** — Skills activate via slash commands or auto-triggering
 - **No more step navigation** — The agent progresses through phases automatically
 - **Human gates still work** — The agent pauses for your approval at review points
-- **Output artifacts** — Still written to `_bmad-output/` (or wherever you configure)
+- **Output artifacts** — Still written to `meld-output/` (or wherever you configure)
 
 ### 4. Optional: Keep Beads for Full Pipeline
 
-The full BMAD pipeline (phases 1-4) is still only available via beads formulas. The plugin MVP covers quick-spec and quick-dev flows. If you need the full pipeline:
+The full MELD pipeline (phases 1-4) is still only available via beads formulas. The plugin MVP covers quick-spec and quick-dev flows. If you need the full pipeline:
 
 ```bash
 # Legacy install still works
@@ -75,5 +75,4 @@ The full BMAD pipeline (phases 1-4) is still only available via beads formulas. 
 
 ## Beads Integration Going Forward
 
-Beads formulas remain in the `formulas/` directory and the original step files remain in `skills/bmad/`. The `legacy/install.sh` script copies these into beads-enabled projects. Formula step descriptions now include `Plugin skill:` references alongside `Follow:` paths, so both models point to the same methodology.
-
+Beads formulas remain in the `formulas/` directory and the original step files remain in `skills/meld/`. The `legacy/install.sh` script copies these into beads-enabled projects. Formula step descriptions now include `Plugin skill:` references alongside `Follow:` paths, so both models point to the same methodology.

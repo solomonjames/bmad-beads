@@ -1,14 +1,14 @@
 {
-  "name": "bmad-dev",
-  "description": "Development marketplace for BMAD methodology plugin",
+  "name": "meld-dev",
+  "description": "Development marketplace for MELD methodology plugin",
   "owner": {
     "name": "James Solomon",
     "email": "james@solomonjames.com"
   },
   "plugins": [
     {
-      "name": "bmad",
-      "description": "BMAD methodology for Claude Code: personas, complexity routing, spec engineering, adversarial review, and structured product development",
+      "name": "meld",
+      "description": "MELD methodology for Claude Code: personas, complexity routing, spec engineering, adversarial review, and structured product development",
       "version": "1.0.0",
       "source": "./",
       "author": {

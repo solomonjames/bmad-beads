@@ -1,18 +1,18 @@
 # Beads Workflow Pipeline
 
-This project uses [beads](https://github.com/steveyegge/beads) formulas to drive a structured development lifecycle adapted from the BMAD v6.0 methodology. Formulas define **what** happens and **in what order**; skill files define **how** each step is executed.
+This project uses [beads](https://github.com/steveyegge/beads) formulas to drive a structured development lifecycle adapted from the MELD v6.0 methodology. Formulas define **what** happens and **in what order**; skill files define **how** each step is executed.
 
 ## Available Formulas
 
 | Formula | Phase | Steps | Human Gates | Use When |
 |---------|-------|-------|-------------|----------|
-| `bmad-analysis` | 1 | 4 | 1 | Starting a new product — discover vision, users, metrics, scope |
-| `bmad-planning` | 2 | 6 | 2 | Creating PRD and UX design specification |
-| `bmad-solutioning` | 3 | 6 | 2 | Architecture decisions, epics, stories, readiness check |
-| `bmad-implementation` | 4 | 7 | 2 | Sprint execution — plan, develop, review, retrospective |
-| `bmad-quick-spec` | — | 4 | 1 | Conversational spec engineering — produce implementation-ready tech-spec |
-| `bmad-quick-dev` | — | 6 | 1 | Flexible implementation — execute tech-specs or direct instructions |
-| `bmad-full` | 1–4 | 23 | 7 | Full product lifecycle from idea to working code |
+| `meld-analysis` | 1 | 4 | 1 | Starting a new product — discover vision, users, metrics, scope |
+| `meld-planning` | 2 | 6 | 2 | Creating PRD and UX design specification |
+| `meld-solutioning` | 3 | 6 | 2 | Architecture decisions, epics, stories, readiness check |
+| `meld-implementation` | 4 | 7 | 2 | Sprint execution — plan, develop, review, retrospective |
+| `meld-quick-spec` | — | 4 | 1 | Conversational spec engineering — produce implementation-ready tech-spec |
+| `meld-quick-dev` | — | 6 | 1 | Flexible implementation — execute tech-specs or direct instructions |
+| `meld-full` | 1–4 | 23 | 7 | Full product lifecycle from idea to working code |
 
 List all formulas:
 
@@ -23,7 +23,7 @@ bd formula list
 Preview a formula without creating anything:
 
 ```bash
-bd cook bmad-solutioning --dry-run --var project_name="MyApp"
+bd cook meld-solutioning --dry-run --var project_name="MyApp"
 ```
 
 ## Quick Start
@@ -31,20 +31,20 @@ bd cook bmad-solutioning --dry-run --var project_name="MyApp"
 ### Option A: Full pipeline (new product)
 
 ```bash
-bd mol pour bmad-full --var project_name="MyApp"
+bd mol pour meld-full --var project_name="MyApp"
 bd ready          # shows first step: "Initialize brief and discover vision for MyApp"
 ```
 
 ### Option B: Single phase
 
 ```bash
-bd mol pour bmad-solutioning --var project_name="MyApp"
+bd mol pour meld-solutioning --var project_name="MyApp"
 ```
 
 ### Option C: Quick spec (produce a tech-spec)
 
 ```bash
-bd mol pour bmad-quick-spec \
+bd mol pour meld-quick-spec \
   --var project_name="MyApp" \
   --var feature="Add avatar upload"
 ```
@@ -53,13 +53,13 @@ bd mol pour bmad-quick-spec \
 
 ```bash
 # Mode A — from a tech-spec
-bd mol pour bmad-quick-dev \
+bd mol pour meld-quick-dev \
   --var project_name="MyApp" \
   --var feature="Add avatar upload" \
-  --var tech_spec_path="_bmad-output/implementation-artifacts/tech-spec-avatar-upload.md"
+  --var tech_spec_path="meld-output/implementation-artifacts/tech-spec-avatar-upload.md"
 
 # Mode B — direct instructions
-bd mol pour bmad-quick-dev \
+bd mol pour meld-quick-dev \
   --var project_name="MyApp" \
   --var feature="Add avatar upload"
 ```
@@ -83,10 +83,10 @@ Each step description tells you which **agent persona** and **skill file** to fo
 
 ```
 Agent: Winston (Architect)
-Follow: .beads/skills/bmad/phase-3-solutioning/create-architecture/step-02-decisions.md
+Follow: .beads/skills/meld/phase-3-solutioning/create-architecture/step-02-decisions.md
 ```
 
-1. **Load the persona** — Read `.beads/skills/bmad/agents/architect.md` to adopt Winston's communication style and principles.
+1. **Load the persona** — Read `.beads/skills/meld/agents/architect.md` to adopt Winston's communication style and principles.
 2. **Read the skill file** — The skill file contains detailed instructions, success criteria, and expected outputs.
 3. **Do the work** — Follow the instructions, produce the artifacts.
 4. **Close the step** — `bd close <id>` when success criteria are met.
@@ -110,11 +110,11 @@ Each workflow step references an agent persona that defines the communication st
 | `ux-designer.md` | Sally | UX design, user research, visual direction |
 | `quick-flow-solo-dev.md` | Barry | Full-stack quick flow, spec-to-implementation |
 
-Persona files live in `.beads/skills/bmad/agents/`.
+Persona files live in `.beads/skills/meld/agents/`.
 
 ## Phase Breakdown
 
-### Phase 1: Analysis (`bmad-analysis`)
+### Phase 1: Analysis (`meld-analysis`)
 
 Produces a **product brief** through collaborative discovery with the Analyst persona.
 
@@ -125,9 +125,9 @@ Produces a **product brief** through collaborative discovery with the Analyst pe
 | 3 | `brief-draft` | Define MVP scope and future vision |
 | 4 | `brief-review` | Human gate — approve product brief |
 
-**Output:** `_bmad-output/planning-artifacts/product-brief-<name>.md`
+**Output:** `meld-output/planning-artifacts/product-brief-<name>.md`
 
-### Phase 2: Planning (`bmad-planning`)
+### Phase 2: Planning (`meld-planning`)
 
 Produces a **PRD** and **UX design specification**.
 
@@ -142,7 +142,7 @@ Produces a **PRD** and **UX design specification**.
 
 **Outputs:** `prd.md`, `ux-design-specification.md`
 
-### Phase 3: Solutioning (`bmad-solutioning`)
+### Phase 3: Solutioning (`meld-solutioning`)
 
 Produces **architecture decisions**, **epics**, and **stories**.
 
@@ -157,7 +157,7 @@ Produces **architecture decisions**, **epics**, and **stories**.
 
 **Outputs:** `architecture.md`, `epics.md`, story files
 
-### Phase 4: Implementation (`bmad-implementation`)
+### Phase 4: Implementation (`meld-implementation`)
 
 Executes sprints: **plan → develop → review → retrospective**.
 
@@ -175,7 +175,7 @@ For multi-story sprints, repeat steps 3–6 for each story before the retrospect
 
 **Outputs:** `sprint-status.yaml`, story files, implemented code
 
-### Quick Spec (`bmad-quick-spec`)
+### Quick Spec (`meld-quick-spec`)
 
 Conversational spec engineering — ask questions, investigate code, produce implementation-ready tech-spec with WIP file lifecycle and adversarial review option.
 
@@ -188,7 +188,7 @@ Conversational spec engineering — ask questions, investigate code, produce imp
 
 **Output:** `{{impl_artifacts}}/tech-spec-{slug}.md`
 
-### Quick Dev (`bmad-quick-dev`)
+### Quick Dev (`meld-quick-dev`)
 
 Flexible implementation engine — execute tech-specs (Mode A) or direct instructions (Mode B) with escalation assessment, continuous execution, self-check, and adversarial review.
 
@@ -207,10 +207,10 @@ Formulas are poured into **molecules** (persistent) or **wisps** (ephemeral):
 
 ```bash
 # Persistent — tracked in git, survives across sessions
-bd mol pour bmad-analysis --var project_name="MyApp"
+bd mol pour meld-analysis --var project_name="MyApp"
 
 # Ephemeral — auto-cleaned, no git sync
-bd mol wisp bmad-quick-spec --var project_name="MyApp" --var feature="Fix bug"
+bd mol wisp meld-quick-spec --var project_name="MyApp" --var feature="Fix bug"
 
 # Check molecule progress
 bd mol progress <mol-id>
@@ -226,15 +226,15 @@ Use `pour` for feature implementations and multi-session work. Use `wisp` for on
 ```
 .beads/
 ├── formulas/                           # 7 TOML workflow definitions
-│   ├── bmad-analysis.formula.toml
-│   ├── bmad-planning.formula.toml
-│   ├── bmad-solutioning.formula.toml
-│   ├── bmad-implementation.formula.toml
-│   ├── bmad-quick-spec.formula.toml
-│   ├── bmad-quick-dev.formula.toml
-│   └── bmad-full.formula.toml
+│   ├── meld-analysis.formula.toml
+│   ├── meld-planning.formula.toml
+│   ├── meld-solutioning.formula.toml
+│   ├── meld-implementation.formula.toml
+│   ├── meld-quick-spec.formula.toml
+│   ├── meld-quick-dev.formula.toml
+│   └── meld-full.formula.toml
 │
-└── skills/bmad/
+└── skills/meld/
     ├── agents/                         # 8 agent persona files
     ├── phase-1-analysis/               # 4 skill files
     ├── phase-2-planning/               # 6 skill files (PRD + UX)
@@ -252,7 +252,7 @@ Each formula accepts variables via `--var key=value`:
 | Variable | Required | Default | Used By |
 |----------|----------|---------|---------|
 | `project_name` | Yes | — | All formulas |
-| `feature` | Yes | — | `bmad-quick-spec`, `bmad-quick-dev` |
-| `tech_spec_path` | No | — | `bmad-quick-dev` only (Mode A if provided) |
-| `planning_artifacts` | No | `_bmad-output/planning-artifacts` | Phases 1–3, full |
-| `impl_artifacts` | No | `_bmad-output/implementation-artifacts` | Phases 3–4, full |
+| `feature` | Yes | — | `meld-quick-spec`, `meld-quick-dev` |
+| `tech_spec_path` | No | — | `meld-quick-dev` only (Mode A if provided) |
+| `planning_artifacts` | No | `meld-output/planning-artifacts` | Phases 1–3, full |
+| `impl_artifacts` | No | `meld-output/implementation-artifacts` | Phases 3–4, full |

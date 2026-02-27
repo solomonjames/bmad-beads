@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# SessionStart hook for bmad plugin
+# SessionStart hook for meld plugin
 
 set -euo pipefail
 
@@ -7,8 +7,8 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")" && pwd)"
 PLUGIN_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
 
-# Read using-bmad content
-using_bmad_content=$(cat "${PLUGIN_ROOT}/skills/using-bmad/SKILL.md" 2>&1 || echo "Error reading using-bmad skill")
+# Read using-meld content
+using_meld_content=$(cat "${PLUGIN_ROOT}/skills/using-meld/SKILL.md" 2>&1 || echo "Error reading using-meld skill")
 
 # Escape string for JSON embedding using bash parameter substitution.
 escape_for_json() {
@@ -21,8 +21,8 @@ escape_for_json() {
     printf '%s' "$s"
 }
 
-using_bmad_escaped=$(escape_for_json "$using_bmad_content")
-session_context="<EXTREMELY_IMPORTANT>\nYou have BMAD methodology skills available.\n\n**Below is the full content of your 'bmad:using-bmad' skill - your guide to BMAD methodology skills. For all other skills, use the 'Skill' tool:**\n\n${using_bmad_escaped}\n</EXTREMELY_IMPORTANT>"
+using_meld_escaped=$(escape_for_json "$using_meld_content")
+session_context="<EXTREMELY_IMPORTANT>\nYou have MELD methodology skills available.\n\n**Below is the full content of your 'meld:using-meld' skill - your guide to MELD methodology skills. For all other skills, use the 'Skill' tool:**\n\n${using_meld_escaped}\n</EXTREMELY_IMPORTANT>"
 
 # Walk up from CWD to find a .beads/ directory (validated by metadata.json)
 beads_root=""
