@@ -32,21 +32,26 @@ Every metadata update must:
 2. Merge new fields into the existing object (never discard existing keys)
 3. Write full merged JSON: `bd update {ticket_id} --metadata '{...}'`
 
-## Checklist
+## Progress Tracking
 
-Track progress using TodoWrite:
+At skill start, create all tasks below using TaskCreate (with `subject` and `activeForm` from this table). As each step begins, mark it `in_progress` via TaskUpdate. When complete, mark it `completed`.
 
-- [ ] Capture baseline commit
-- [ ] Detect execution mode — tech-spec vs. direct (or ticket-driven if beads-active)
-- [ ] Create worktree (if beads-active or user opts in)
-- [ ] Gather context and confirm plan (Mode B only)
-- [ ] Execute implementation — all tasks continuous, track via sub-tickets if beads-active
-- [ ] Code simplification pass — subagent reviews modified code for clarity and consistency
-- [ ] Run 12-point self-check
-- [ ] Run verification gate — fresh evidence for all completion claims
-- [ ] Adversarial review with information asymmetry
-- [ ] Human review gate — resolve findings
-- [ ] Completion summary — update ticket or local spec, close sub-tickets
+| # | subject | activeForm | blockedBy |
+|---|---------|------------|-----------|
+| 1 | Capture baseline commit | Capturing baseline commit | — |
+| 2 | Detect execution mode | Detecting execution mode | 1 |
+| 3 | Create worktree if applicable | Creating worktree | 2 |
+| 4 | Gather context and confirm plan | Gathering context and confirming plan | 3 |
+| 5 | Execute implementation | Executing implementation tasks | 3 or 4 |
+| 6 | Run code simplification pass | Running code simplification pass | 5 |
+| 7 | Run 12-point self-check | Running 12-point self-check | 6 |
+| 8 | Run verification gate | Running verification gate | 7 |
+| 9 | Run adversarial review | Running adversarial review | 8 |
+| 10 | Resolve findings at human review gate | Resolving review findings | 9 |
+| 11 | Write completion summary | Writing completion summary | 10 |
+
+**Mode note:** Task 5 depends on task 3 in Mode A (skip context gathering) or task 4 in Mode B. Set the dependency based on the detected mode. If Mode A, mark task 4 `completed` immediately.
+**Skip note:** Task 3 (worktree) may be skipped — if so, mark it `completed` with a skip reason.
 
 ---
 

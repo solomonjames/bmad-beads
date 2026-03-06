@@ -50,7 +50,7 @@ Formulas (TOML) define step sequences with dependencies. Each step references an
 
 Each plugin skill is a single `SKILL.md` file with:
 - **YAML frontmatter:** `name` and `description` (used for skill discovery and auto-triggering)
-- **Checklist:** Items tracked via TodoWrite during execution
+- **Progress Tracking:** Tasks created via TaskCreate/TaskUpdate during execution
 - **Phases:** Logical groupings of work within the skill
 - **Sub-skill references:** `meld:skill-name` for other MELD skills
 

@@ -30,23 +30,25 @@ Every metadata update must:
 2. Merge new fields into the existing object (never discard existing keys)
 3. Write full merged JSON: `bd update {ticket_id} --metadata '{...}'`
 
-## Checklist
+## Progress Tracking
 
-Track progress using TodoWrite:
+At skill start, create all tasks below using TaskCreate (with `subject` and `activeForm` from this table). As each step begins, mark it `in_progress` via TaskUpdate. When complete, mark it `completed`.
 
-- [ ] Resume check — check for existing WIP spec (or ticket state if beads-active)
-- [ ] Understand requirement — greet user, capture feature description
-- [ ] Orient scan — quick scan of codebase and planning artifacts
-- [ ] Ask informed questions — code-anchored clarification questions
-- [ ] Capture core understanding — title, slug, problem, solution, scope
-- [ ] Write spec overview — to WIP file or ticket design field
-- [ ] Deep code investigation — files, patterns, dependencies, tests
-- [ ] Confirm technical context — present findings to user
-- [ ] Write technical context — to WIP file or ticket notes field
-- [ ] Generate implementation tasks — as spec tasks or sub-tickets
-- [ ] Generate acceptance criteria — Given/When/Then format
-- [ ] Verify ready-for-dev standard
-- [ ] Human review gate — present spec, handle feedback, finalize
+| # | subject | activeForm | blockedBy |
+|---|---------|------------|-----------|
+| 1 | Check for existing WIP spec | Checking for existing WIP spec | — |
+| 2 | Understand requirement from user | Understanding requirement | 1 |
+| 3 | Run orient scan of codebase | Running orient scan | 2 |
+| 4 | Ask informed clarification questions | Asking informed questions | 3 |
+| 5 | Capture core understanding | Capturing core understanding | 4 |
+| 6 | Write spec overview | Writing spec overview | 5 |
+| 7 | Run deep code investigation | Running deep code investigation | 6 |
+| 8 | Confirm technical context with user | Confirming technical context | 7 |
+| 9 | Write technical context | Writing technical context | 8 |
+| 10 | Generate implementation tasks | Generating implementation tasks | 9 |
+| 11 | Generate acceptance criteria | Generating acceptance criteria | 10 |
+| 12 | Verify ready-for-dev standard | Verifying ready-for-dev standard | 11 |
+| 13 | Run human review gate | Running human review gate | 12 |
 
 ---
 

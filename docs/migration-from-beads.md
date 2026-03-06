@@ -9,7 +9,7 @@ This guide helps existing meld users transition from the beads formula model to 
 | `./install.sh /path/to/project` | `/plugin install meld` |
 | `bd mol pour meld-quick-spec --var ...` | `/quick-spec` |
 | `bd mol pour meld-quick-dev --var ...` | `/quick-dev` |
-| Steps create beads issues | Skills track progress via TodoWrite |
+| Steps create beads issues | Skills track progress via TaskCreate/TaskUpdate |
 | `bd ready` / `bd close` to navigate | Agent auto-progresses through phases |
 | Variables via `--var` flags | State tracked in conversation context |
 | Skills at `.beads/skills/meld/` | Skills at plugin `skills/` directory |
