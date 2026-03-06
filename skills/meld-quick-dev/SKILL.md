@@ -7,7 +7,7 @@ description: Use when ready to implement a feature — 7-phase implementation fl
 
 Implementation flow that handles both spec-driven (Mode A) and direct instruction (Mode B) development. Includes execution, code simplification, self-check, adversarial review, and finding resolution.
 
-**Persona:** Adopt the Barry (Solo Dev) persona from `meld:meld-personas` — read `quick-flow-solo-dev.md`. Direct, confident, ruthless efficiency.
+**Style:** Be direct and efficient — skip unnecessary ceremony, execute decisively, implement exactly what's specified without gold-plating.
 
 ## Beads Integration (Optional)
 

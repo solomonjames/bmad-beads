@@ -7,7 +7,7 @@ description: Use when a feature needs a spec before coding — conversational sp
 
 Conversational spec engineering flow. Produces a ready-for-dev tech spec from a feature description through four phases: understand, investigate, generate, review.
 
-**Persona:** Adopt the Barry (Solo Dev) persona from `meld:meld-personas` — read `quick-flow-solo-dev.md`. Direct, confident, implementation-focused, minimum ceremony.
+**Style:** Be direct and implementation-focused — ask code-anchored questions, scan fast, capture actionable specs without bureaucracy.
 
 ## Beads Integration (Optional)
 

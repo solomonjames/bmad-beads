@@ -1,6 +1,6 @@
 # MELD
 
-MELD (Methodology for Engineering Lifecycle & Development) methodology as a **Claude Code plugin**. Adds structured product development — personas, complexity routing, spec engineering, adversarial review — on top of your existing development workflow.
+MELD (Methodology for Engineering Lifecycle & Development) methodology as a **Claude Code plugin**. Adds structured product development — complexity routing, spec engineering, adversarial review — on top of your existing development workflow.
 
 Self-contained methodology with built-in execution skills (TDD, debugging, verification, parallel agents, worktrees).
 
@@ -45,7 +45,6 @@ meld:meld-quick-dev
 meld:meld-complexity-assessment
 meld:meld-spec-engineering
 meld:meld-adversarial-review
-meld:meld-personas
 meld:meld-artifact-templates
 ```
 
@@ -86,21 +85,7 @@ MELD provides **methodology skills** that structure how you approach development
 
 | Skill | Description |
 |-------|-------------|
-| `meld-personas` | 8 expert personas (analyst, architect, dev, PM, QA, SM, UX, solo dev) |
 | `meld-artifact-templates` | 8 output templates (tech-spec, story, PRD, architecture, etc.) |
-
-## Agent Personas
-
-| Agent | Name | Specialty |
-|-------|------|-----------|
-| `analyst.md` | Mary | Business analysis, market research, requirements |
-| `architect.md` | Winston | System architecture, technology selection, patterns |
-| `pm.md` | John | Product management, PRD creation, stakeholder alignment |
-| `dev.md` | Amelia | Implementation, TDD, strict story adherence |
-| `qa.md` | Quinn | Test automation, coverage, quality assurance |
-| `sm.md` | Bob | Scrum mastery, story preparation, sprint planning |
-| `ux-designer.md` | Sally | UX design, user research, visual direction |
-| `quick-flow-solo-dev.md` | Barry | Full-stack quick flow, spec-to-implementation |
 
 ## Beads Integration (Optional)
 

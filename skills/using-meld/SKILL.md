@@ -7,7 +7,6 @@ description: Use when starting any conversation - establishes when to use MELD m
 
 MELD (Methodology for Engineering Lifecycle & Development) provides a complete methodology for structured product development — from planning through execution to review. It includes:
 
-- **Personas** — Expert viewpoints for different phases of work
 - **Complexity routing** — Match approach depth to problem complexity
 - **Spec engineering** — Structured Given/When/Then specifications with ready-for-dev standards
 - **Adversarial review** — Information-asymmetric code review using subagents
@@ -27,7 +26,6 @@ MELD (Methodology for Engineering Lifecycle & Development) provides a complete m
 | Starting isolated work on a ticket | `meld:meld-worktrees` | Built into quick-dev |
 | Code needs cleanup after implementation | `meld:meld-code-simplifier` | Built into quick-dev |
 | Implementation complete, need review | `meld:meld-adversarial-review` | `meld:meld-verification` |
-| Need a specific expert perspective | `meld:meld-personas` | — |
 | Need an output template (tech-spec, PRD, etc.) | `meld:meld-artifact-templates` | — |
 
 ## When NOT to Use MELD Skills
@@ -85,8 +83,7 @@ bd close bd-abc123                          # done
 - **`meld-spec-engineering`** — Given/When/Then acceptance criteria format and ready-for-dev standards.
 - **`meld-adversarial-review`** — Code review with information asymmetry using subagents.
 
-### Reference Skills (look up personas and templates)
-- **`meld-personas`** — Index of 8 expert personas (analyst, architect, dev, PM, QA, scrum master, UX designer, solo dev).
+### Reference Skills
 - **`meld-artifact-templates`** — Index of 8 output templates (tech-spec, story, PRD, product brief, architecture decision, epics, UX design, sprint status).
 
 ## Slash Commands

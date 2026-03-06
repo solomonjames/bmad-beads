@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-MELD is a Claude Code plugin that implements the MELD (Methodology for Engineering Lifecycle & Development) methodology. It provides structured product development with agent personas, complexity routing, spec engineering, adversarial review, and execution skills (TDD, debugging, verification, parallel agents, worktrees).
+MELD is a Claude Code plugin that implements the MELD (Methodology for Engineering Lifecycle & Development) methodology. It provides structured product development with complexity routing, spec engineering, adversarial review, and execution skills (TDD, debugging, verification, parallel agents, worktrees).
 
 This is **not** a code library — it is a plugin/workflow system with no build step, no tests, and no package manager.
 
@@ -29,7 +29,6 @@ This is **not** a code library — it is a plugin/workflow system with no build 
 - `skills/meld-verification/` — Verification before completion: 5-step gate function
 - `skills/meld-parallel-agents/` — Parallel agent dispatch and integration
 - `skills/meld-worktrees/` — Git worktree creation with ticket-based branch naming
-- `skills/meld-personas/` — 8 expert persona files + index
 - `skills/meld-artifact-templates/` — 8 output templates + index
 
 ### Beads Integration (Legacy)
@@ -57,8 +56,8 @@ Each plugin skill is a single `SKILL.md` file with:
 ### Naming Convention
 All skills are prefixed `meld-` to avoid collisions. Invoked as `meld:meld-quick-spec` (plugin:skill format).
 
-### Persona Pattern
-Skills reference personas by saying "Adopt the Barry persona from `meld:meld-personas`." The agent reads the persona file and embodies that identity throughout the workflow.
+### Style Instructions
+Flow skills include a one-line `**Style:**` directive that sets behavioral expectations (e.g., "Be direct and efficient"). No external persona files are loaded.
 
 ## Key Patterns
 
@@ -73,6 +72,5 @@ Skills reference personas by saying "Adopt the Barry persona from `meld:meld-per
 - **Plugin skills** (`skills/meld-*/SKILL.md`): Single file per skill with YAML frontmatter. Keep skills focused — one concept per file, practical over theoretical.
 - **Commands** (`commands/*.md`): Lightweight wrappers with YAML frontmatter (`description`, `disable-model-invocation: true`) that invoke a skill.
 - **Hooks** (`hooks/`): SessionStart injects meta-skill content. Uses JSON output compatible with both Cursor and Claude Code.
-- **Personas** (`skills/meld-personas/*.md`): Define Identity, Communication Style, Core Principles, Activation Triggers.
 - **Templates** (`skills/meld-artifact-templates/*.md`): Use `{{variable}}` placeholders and YAML frontmatter for metadata.
 - **Beads formulas** (`formulas/*.toml`): TOML with `[[step]]` arrays. Each step has `id`, `title`, `description`, `depends_on`.
