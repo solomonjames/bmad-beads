@@ -1,0 +1,11 @@
+{
+  "eval_id": 2,
+  "config": "with_skill",
+  "expectations": [
+    {"text": "Correctly identifies Mode B (no tech spec)", "passed": true, "evidence": "Explicitly states 'Mode B detected' — no tech-spec path, no beads ticket"},
+    {"text": "Runs complexity assessment", "passed": true, "evidence": "Invokes meld:meld-complexity-assessment, evaluates all 5 signals systematically"},
+    {"text": "Identifies 2+ complexity signals (multi-component, multi-layer)", "passed": true, "evidence": "Identifies Multi-component (YES) and Multi-layer (YES), counts 2/5 signals, routes to Moderate"},
+    {"text": "Recommends escalation ([P] Plan first or [W] Full MELD)", "passed": true, "evidence": "Recommends [P] Plan first as the default, explains reasoning about moving parts benefiting from a spec"},
+    {"text": "Does not jump straight to coding without a plan", "passed": true, "evidence": "Even after user chooses [E], full Phase 2 context gathering runs with a 7-task plan, 9 ACs, and a human confirmation gate before execution"}
+  ]
+}

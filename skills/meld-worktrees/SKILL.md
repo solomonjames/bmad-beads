@@ -137,7 +137,7 @@ Key reminders:
 
 ## Completion
 
-When work is done (quick-dev Phase 7), present these options:
+When work is done (quick-dev Phase 5), present these options:
 
 ### Option 1: Create Pull Request
 
@@ -173,11 +173,11 @@ git branch -D {branch_name}
 
 This skill is invoked at two points in `meld:meld-quick-dev`:
 
-1. **Phase 1 (Mode Detection)** — After "Capture Baseline Commit":
+1. **Phase 1 (Setup & Mode Detection)** — After "Capture Baseline Commit":
    - If `{beads_active}`: auto-create worktree with ticket-based branch name
    - If not: offer worktree as an option
    - Re-capture baseline commit from worktree HEAD
 
-2. **Phase 7 (Resolve Findings)** — Before "Update Spec Artifact":
+2. **Phase 5 (Adversarial Review & Resolution)** — After resolving findings:
    - If in a worktree, present completion options (PR/Merge/Keep/Discard)
    - User decides what to do with the worktree

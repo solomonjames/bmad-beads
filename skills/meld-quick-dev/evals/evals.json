@@ -1,0 +1,23 @@
+{
+  "skill_name": "meld-quick-dev",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Add a `slugify` utility function to `src/utils/` that converts strings to URL-safe slugs. We use TypeScript, Jest for tests, and there's already a `src/utils/string-helpers.ts` file with similar utilities.",
+      "expected_output": "Mode B detection, low complexity assessment routing to [E] Execute, context gathering with plan, TDD execution loop (RED-GREEN-REFACTOR), verification gate",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "Add user authentication with JWT tokens to this Express API. Need login/register endpoints, password hashing, token refresh, and middleware to protect existing routes. Using TypeScript, Prisma for DB, Jest for tests.",
+      "expected_output": "Mode B detection, moderate-to-high complexity assessment (multi-component + multi-layer signals), recommendation to plan first [P], escalation handling",
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "Implement the following tech spec:\n\n---\ntitle: Add CSV Export\nstatus: ready-for-dev\n---\n\n## Overview\nAdd CSV export functionality to the reports page.\n\n## Acceptance Criteria\n- Given a user on the reports page, when they click 'Export CSV', then a CSV file downloads containing all visible report rows\n- Given a report with date columns, when exported, then dates are formatted as YYYY-MM-DD\n- Given an empty report, when export is clicked, then a CSV with only headers downloads\n\n## Tasks\n1. Create `src/utils/csv-export.ts` with `exportToCsv(data, columns)` function\n2. Add 'Export CSV' button to `src/components/ReportsPage.tsx`\n3. Wire button click to trigger CSV download\n4. Add tests for csv-export utility\n5. Add integration test for export button",
+      "expected_output": "Mode A detection (tech spec provided), skip Phase 2 entirely, go straight to TDD execution of the 5 tasks in order, no re-planning or unnecessary context gathering",
+      "files": []
+    }
+  ]
+}

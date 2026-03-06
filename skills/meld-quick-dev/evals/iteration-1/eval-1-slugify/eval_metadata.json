@@ -1,0 +1,14 @@
+{
+  "eval_id": 1,
+  "eval_name": "simple-mode-b-slugify",
+  "prompt": "Add a `slugify` utility function to `src/utils/` that converts strings to URL-safe slugs. We use TypeScript, Jest for tests, and there's already a `src/utils/string-helpers.ts` file with similar utilities.",
+  "assertions": [
+    {"text": "Correctly identifies Mode B (no tech spec)", "type": "boolean"},
+    {"text": "Runs complexity assessment before diving in", "type": "boolean"},
+    {"text": "Routes to [E] Execute for low complexity", "type": "boolean"},
+    {"text": "Creates implementation plan before writing code", "type": "boolean"},
+    {"text": "Plans TDD approach (test-first RED-GREEN-REFACTOR)", "type": "boolean"},
+    {"text": "Reads existing string-helpers.ts for patterns", "type": "boolean"},
+    {"text": "Includes verification/self-check before claiming done", "type": "boolean"}
+  ]
+}

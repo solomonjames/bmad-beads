@@ -1,0 +1,13 @@
+{
+  "eval_id": 1,
+  "config": "without_skill",
+  "expectations": [
+    {"text": "Correctly identifies Mode B (no tech spec)", "passed": false, "evidence": "No mode detection concept exists — jumps straight to understanding the request"},
+    {"text": "Runs complexity assessment before diving in", "passed": false, "evidence": "No complexity assessment — goes directly to reading the existing file"},
+    {"text": "Routes to [E] Execute for low complexity", "passed": false, "evidence": "No routing decision made — no complexity framework used"},
+    {"text": "Creates implementation plan before writing code", "passed": false, "evidence": "Steps 1-5 are reconnaissance but no formal plan is presented for confirmation before coding. Implementation (step 6) happens without explicit plan approval gate"},
+    {"text": "Plans TDD approach (test-first RED-GREEN-REFACTOR)", "passed": false, "evidence": "Implementation is step 6, tests are step 7 — code before tests, not test-first"},
+    {"text": "Reads existing string-helpers.ts for patterns", "passed": true, "evidence": "Step 2 reads existing file for coding style, conventions, and patterns"},
+    {"text": "Includes verification/self-check before claiming done", "passed": false, "evidence": "Step 10 has basic verification (re-read, re-run tests) but no structured checklist or gate function"}
+  ]
+}

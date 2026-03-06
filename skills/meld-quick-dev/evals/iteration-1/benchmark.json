@@ -1,0 +1,95 @@
+{
+  "skill_name": "meld-quick-dev",
+  "iteration": 1,
+  "configs": [
+    {
+      "name": "with_skill",
+      "results": [
+        {
+          "eval_id": 1,
+          "eval_name": "simple-mode-b-slugify",
+          "pass_rate": 1.0,
+          "passed": 7,
+          "total": 7,
+          "tokens": 19358,
+          "duration_seconds": 132.4
+        },
+        {
+          "eval_id": 2,
+          "eval_name": "complex-mode-b-jwt-auth",
+          "pass_rate": 1.0,
+          "passed": 5,
+          "total": 5,
+          "tokens": 21264,
+          "duration_seconds": 183.7
+        },
+        {
+          "eval_id": 3,
+          "eval_name": "mode-a-spec-driven-csv",
+          "pass_rate": 1.0,
+          "passed": 6,
+          "total": 6,
+          "tokens": 18391,
+          "duration_seconds": 121.4
+        }
+      ],
+      "aggregate": {
+        "mean_pass_rate": 1.0,
+        "stddev_pass_rate": 0.0,
+        "mean_tokens": 19671,
+        "mean_duration_seconds": 145.8
+      }
+    },
+    {
+      "name": "without_skill",
+      "results": [
+        {
+          "eval_id": 1,
+          "eval_name": "simple-mode-b-slugify",
+          "pass_rate": 0.143,
+          "passed": 1,
+          "total": 7,
+          "tokens": 10306,
+          "duration_seconds": 51.6
+        },
+        {
+          "eval_id": 2,
+          "eval_name": "complex-mode-b-jwt-auth",
+          "pass_rate": 0.2,
+          "passed": 1,
+          "total": 5,
+          "tokens": 12070,
+          "duration_seconds": 94.6
+        },
+        {
+          "eval_id": 3,
+          "eval_name": "mode-a-spec-driven-csv",
+          "pass_rate": 0.5,
+          "passed": 3,
+          "total": 6,
+          "tokens": 10919,
+          "duration_seconds": 71.5
+        }
+      ],
+      "aggregate": {
+        "mean_pass_rate": 0.281,
+        "stddev_pass_rate": 0.184,
+        "mean_tokens": 11098,
+        "mean_duration_seconds": 72.6
+      }
+    }
+  ],
+  "delta": {
+    "pass_rate_improvement": 0.719,
+    "token_overhead": 1.77,
+    "time_overhead": 2.01
+  },
+  "analyst_observations": [
+    "The skill achieves 100% pass rate across all 3 evals vs 28.1% baseline — a dramatic improvement in structured decision-making",
+    "The baseline's only consistent pass was 'reads existing patterns' (eval 1) and 'follows spec tasks' / 'no replanning' (eval 3) — these are things Claude does naturally without a skill",
+    "The biggest skill contributions are: (1) complexity assessment before coding, (2) TDD enforcement, (3) human confirmation gates, (4) structured verification",
+    "Token overhead is 1.77x and time overhead is 2.01x — the skill roughly doubles cost and time. This is expected for a methodology skill that adds process phases",
+    "Non-discriminating assertions: 'reads existing patterns' passed for both with/without skill in eval 1, suggesting Claude naturally does codebase reconnaissance",
+    "The baseline approach for eval 2 (JWT auth) was actually quite thorough (10 steps, good security awareness) but lacked structured gates — it would have started coding a complex feature without confirming the plan"
+  ]
+}

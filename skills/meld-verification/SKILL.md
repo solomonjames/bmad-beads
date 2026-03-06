@@ -1,6 +1,6 @@
 ---
 name: meld-verification
-description: Verification before completion — 5-step gate function that requires fresh evidence for every completion claim. Referenced by quick-dev Phases 5 and 7.
+description: Verification before completion — 5-step gate function that requires fresh evidence for every completion claim. Referenced by quick-dev Phases 4 and 5.
 ---
 
 # Verification Before Completion
@@ -109,9 +109,9 @@ Only now can you say "done" or "complete." Include the evidence summary.
 
 This skill is invoked at two points in `meld:meld-quick-dev`:
 
-1. **Phase 5 (Self-Check)** — After the 12-point self-audit, run the full gate function. All claims from the audit must have fresh evidence.
+1. **Phase 4 (Verify & Self-Check)** — After the self-audit, run the full gate function. All claims from the audit must have fresh evidence.
 
-2. **Phase 7 (Completion)** — Before the final completion summary, run the gate function one last time. This catches regressions introduced during finding resolution.
+2. **Phase 5 (Adversarial Review & Resolution)** — After resolving review findings, run the gate function one last time. This catches regressions introduced during finding resolution.
 
 ## Verification for Agent Delegation
 

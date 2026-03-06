@@ -1,0 +1,12 @@
+{
+  "eval_id": 3,
+  "config": "with_skill",
+  "expectations": [
+    {"text": "Correctly identifies Mode A (tech spec provided)", "passed": true, "evidence": "Explicitly states 'Decision: Mode A (Tech Spec / Structured)' — identifies ready-for-dev status, ACs, and task list"},
+    {"text": "Skips Phase 2 (context gathering) entirely", "passed": true, "evidence": "Phase 2 section explicitly says 'SKIPPED' with explanation. Task 2 marked completed immediately per skill instructions"},
+    {"text": "Executes all 5 tasks from the spec", "passed": true, "evidence": "All 5 tasks covered — reordered into 2 TDD units (Tasks 1+4 and Tasks 2+3+5) but all 5 completed"},
+    {"text": "Plans TDD (RED-GREEN-REFACTOR) for each task", "passed": true, "evidence": "Both execution units follow explicit RED → GREEN → REFACTOR cycle with test-first approach"},
+    {"text": "References acceptance criteria during verification", "passed": true, "evidence": "Phase 4 self-audit maps each AC to specific implementation and test evidence (items 7-9 in checklist)"},
+    {"text": "Does not stop to re-plan or ask unnecessary questions", "passed": true, "evidence": "No re-planning — goes from Phase 1 mode detection straight to Phase 3 execution. Key decisions table confirms 'Phase 2 skipped'"}
+  ]
+}

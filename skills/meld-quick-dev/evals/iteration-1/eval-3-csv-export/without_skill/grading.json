@@ -1,0 +1,12 @@
+{
+  "eval_id": 3,
+  "config": "without_skill",
+  "expectations": [
+    {"text": "Correctly identifies Mode A (tech spec provided)", "passed": false, "evidence": "No mode detection — treats the spec as a task list to follow, doesn't recognize it as a structured spec that changes the approach"},
+    {"text": "Skips Phase 2 (context gathering) entirely", "passed": false, "evidence": "Step 1 does full codebase exploration (Glob, Read, Grep) despite having a complete spec with explicit tasks and ACs"},
+    {"text": "Executes all 5 tasks from the spec", "passed": true, "evidence": "Steps 2-6 map to the 5 spec tasks in order (csv utility, button, wiring, unit tests, integration test)"},
+    {"text": "Plans TDD (RED-GREEN-REFACTOR) for each task", "passed": false, "evidence": "Implementation comes first (steps 2-4), tests come after (steps 5-6) — classic code-then-test approach, not TDD"},
+    {"text": "References acceptance criteria during verification", "passed": true, "evidence": "Step 7 re-reads ACs and maps them to implementation, though not as a formal checklist"},
+    {"text": "Does not stop to re-plan or ask unnecessary questions", "passed": true, "evidence": "Proceeds through all steps without unnecessary pauses or replanning"}
+  ]
+}

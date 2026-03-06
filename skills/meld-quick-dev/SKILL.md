@@ -1,13 +1,23 @@
 ---
 name: meld-quick-dev
-description: Use when ready to implement a feature — 7-phase implementation flow with mode detection, execution, code simplification, self-check, adversarial review, and finding resolution
+description: Use when ready to implement a feature — 5-phase implementation flow with mode detection, TDD execution, verification, adversarial review, and finding resolution
 ---
 
 # Quick Dev
 
-Implementation flow that handles both spec-driven (Mode A) and direct instruction (Mode B) development. Includes execution, code simplification, self-check, adversarial review, and finding resolution.
+Implementation flow that handles both spec-driven (Mode A) and direct instruction (Mode B) development. Includes TDD execution, verification, adversarial review, and finding resolution.
 
 **Style:** Be direct and efficient — skip unnecessary ceremony, execute decisively, implement exactly what's specified without gold-plating.
+
+## Why This Flow
+
+Each phase exists for a specific reason:
+
+1. **Setup & Mode Detection** — Establishes a baseline so you can diff later for review. Determines whether you have a spec (structured) or need to gather context (ad-hoc).
+2. **Context Gathering** (Mode B only) — Without a spec, you need to understand the codebase before writing code. Skipped in Mode A because the spec IS the context.
+3. **Execute** — TDD ensures every behavioral change is verified as you go, not after the fact. Continuous execution without pausing keeps momentum.
+4. **Verify & Self-Check** — Fresh evidence for every completion claim. Models are prone to claiming "done" based on stale or assumed results. This phase forces honesty.
+5. **Adversarial Review & Resolution** — A subagent reviews the diff with NO context about intent. This information asymmetry catches issues the implementing agent is blind to — you can't review your own work objectively.
 
 ## Beads Integration (Optional)
 
@@ -26,36 +36,35 @@ When `{beads_active}`, check ticket metadata:
 - If `metadata.meld_phase == "spec"` and `spec_status != "ready-for-dev"` → warn user that spec is incomplete, suggest running `/quick-spec {ticket_id}` first.
 - Otherwise → fall through to normal Mode B detection.
 
-### Metadata Read-Merge-Write Pattern
-Every metadata update must:
+### Beads Sync Pattern
+Every metadata update follows read-merge-write:
 1. Read current metadata: `bd show {ticket_id} --json` → extract `.metadata`
 2. Merge new fields into the existing object (never discard existing keys)
 3. Write full merged JSON: `bd update {ticket_id} --metadata '{...}'`
 
+Sync at each phase boundary:
+- Update metadata with current `meld_step`
+- Add one `bd comment` summarizing the phase outcome
+- Update sub-ticket statuses as tasks complete
+
 ## Progress Tracking
 
-At skill start, create all tasks below using TaskCreate (with `subject` and `activeForm` from this table). As each step begins, mark it `in_progress` via TaskUpdate. When complete, mark it `completed`.
+At skill start, create these tasks via TaskCreate. Mark `in_progress` when starting, `completed` when done.
 
 | # | subject | activeForm | blockedBy |
 |---|---------|------------|-----------|
-| 1 | Capture baseline commit | Capturing baseline commit | — |
-| 2 | Detect execution mode | Detecting execution mode | 1 |
-| 3 | Create worktree if applicable | Creating worktree | 2 |
-| 4 | Gather context and confirm plan | Gathering context and confirming plan | 3 |
-| 5 | Execute implementation | Executing implementation tasks | 3 or 4 |
-| 6 | Run code simplification pass | Running code simplification pass | 5 |
-| 7 | Run 12-point self-check | Running 12-point self-check | 6 |
-| 8 | Run verification gate | Running verification gate | 7 |
-| 9 | Run adversarial review | Running adversarial review | 8 |
-| 10 | Resolve findings at human review gate | Resolving review findings | 9 |
-| 11 | Write completion summary | Writing completion summary | 10 |
+| 1 | Setup and detect mode | Setting up and detecting mode | — |
+| 2 | Gather context and confirm plan | Gathering context and confirming plan | 1 |
+| 3 | Execute implementation | Executing implementation tasks | 1 or 2 |
+| 4 | Verify and self-check | Running verification and self-check | 3 |
+| 5 | Adversarial review and resolve | Running adversarial review and resolving findings | 4 |
+| 6 | Write completion summary | Writing completion summary | 5 |
 
-**Mode note:** Task 5 depends on task 3 in Mode A (skip context gathering) or task 4 in Mode B. Set the dependency based on the detected mode. If Mode A, mark task 4 `completed` immediately.
-**Skip note:** Task 3 (worktree) may be skipped — if so, mark it `completed` with a skip reason.
+**Mode note:** Task 3 depends on task 1 in Mode A (skip context gathering) or task 2 in Mode B. If Mode A, mark task 2 `completed` immediately.
 
 ---
 
-## Phase 1: Mode Detection
+## Phase 1: Setup & Mode Detection
 
 ### Capture Baseline Commit
 ```bash
@@ -67,8 +76,6 @@ Store as `baseline_commit`. If not in a git repo, set to "NO_GIT".
 Read `project-context.md` if it exists. Note project conventions, patterns, constraints.
 
 ### Determine Execution Mode
-
-**If `{beads_active}`:** Check ticket metadata first (see "Ticket-Driven Mode Detection" above) before falling through to normal detection.
 
 **Mode A — Tech Spec (structured):**
 - Triggers when user provides a tech-spec path, or when `{beads_active}` and ticket has `metadata.spec_status == "ready-for-dev"`
@@ -90,17 +97,19 @@ If user chooses to escalate:
 
 If user chooses **[E] Execute directly** → Continue to Phase 2.
 
-### Create Worktree
+### Create Worktree (Optional)
 
 **If `{beads_active}`:** Auto-create a worktree via `meld:meld-worktrees`. Branch name: `feature/{ticket_id}` (or `feature/{ticket_id}-{spec_slug}` if metadata has `spec_slug`). Re-capture `baseline_commit` from the worktree HEAD.
 
 **If not beads-active:** Offer worktree creation as an option. If accepted, follow `meld:meld-worktrees` with kebab-case branch naming. Re-capture `baseline_commit` from worktree HEAD.
 
-### Phase 1 Sync
+If worktree is declined or not applicable, note it and continue.
+
+### Phase 1 Beads Sync
 If `{beads_active}`:
 1. `bd update {ticket_id} --status in_progress`
-2. Read-merge-write metadata: merge `{"meld_phase": "dev", "meld_step": "mode-detect", "baseline_commit": "{baseline_commit}", "execution_mode": "{mode_a_or_mode_b}"}`
-3. `bd comment {ticket_id} "MELD quick-dev Phase 1 (Mode Detection) complete — {Mode A: tech-spec | Mode B: direct} execution, baseline commit {baseline_commit}"`
+2. Merge metadata: `{"meld_phase": "dev", "meld_step": "mode-detect", "baseline_commit": "{baseline_commit}", "execution_mode": "{mode_a_or_mode_b}"}`
+3. `bd comment {ticket_id} "MELD quick-dev Phase 1 complete — {Mode A/B} execution, baseline {baseline_commit}"`
 
 ---
 
@@ -133,43 +142,42 @@ Mode A skips this phase entirely — the tech spec IS the context.
 ### Present Plan for Confirmation
 Show files, patterns, plan, and acceptance criteria. Ask: "Ready to execute? Adjust anything?"
 
-**Wait for user confirmation before proceeding.**
+**Wait for user confirmation before proceeding.** This is the one human gate before continuous execution — it's the last chance to correct course cheaply.
 
-### Phase 2 Sync (Mode B Only)
+### Phase 2 Beads Sync
 If `{beads_active}`:
 1. `bd update {ticket_id} --notes "**Implementation Plan:**\n\n{task_list}\n\n**Files to modify:** {files_list}\n\n**Dependencies:** {dependencies}"`
 2. `bd update {ticket_id} --acceptance-criteria "{inferred_acceptance_criteria}"`
-3. Read-merge-write metadata: merge `{"meld_step": "context-gather"}`
-4. `bd comment {ticket_id} "MELD quick-dev Phase 2 (Context Gathering) complete — {task_count} tasks planned, {file_count} files identified"`
+3. Merge metadata: `{"meld_step": "context-gather"}`
+4. `bd comment {ticket_id} "MELD quick-dev Phase 2 complete — {task_count} tasks planned, {file_count} files identified"`
 
 ---
 
 ## Phase 3: Execute
 
-**METHODOLOGY:** This phase follows TDD (test-driven development). Read `meld:meld-tdd` for the full methodology, rationalizations table, and red flags. The core rule: **no production code without a failing test first.**
+### TDD Methodology
+This phase follows test-driven development. Read `meld:meld-tdd` for the full methodology — the core rule is **no production code without a failing test first.**
 
-**Exception:** If the project has no test framework or the task is configuration-only, skip TDD steps (3-5) and implement directly. Note the exception in the phase sync comment.
+**Exception:** If the project has no test framework or the task is configuration-only, skip TDD steps and implement directly. Note the exception.
 
 ### Execution Loop
 For each task in the plan/spec:
 
 1. **Start task** — If `{beads_active}` and tasks are sub-tickets: `bd update {sub_id} --status in_progress`
 2. **Load context** — Read relevant files, review patterns, identify test file locations and testing conventions
-3. **RED — Write failing test** — Write one minimal test capturing the expected behavior. Run it. Confirm it **fails** because the feature is missing (not because of errors or typos). If it passes immediately, you're testing existing behavior — fix the test.
-4. **GREEN — Minimal implementation** — Write the simplest code to make the failing test pass. Run all tests. Confirm everything is green.
+3. **RED** — Write one minimal failing test capturing expected behavior. Run it. Confirm it fails because the feature is missing (not errors or typos). If it passes immediately, you're testing existing behavior — fix the test.
+4. **GREEN** — Write the simplest code to make the failing test pass. Run all tests. Confirm everything is green.
 5. **REFACTOR** — Clean up while keeping tests green. Remove duplication, improve names. Do not add behavior.
-6. **Mark complete** — Check off task. If `{beads_active}` and tasks are sub-tickets: `bd close {sub_id}`
+6. **Mark complete** — If `{beads_active}` and tasks are sub-tickets: `bd close {sub_id}`
 7. **Continue immediately** — Next task without pausing
 
 ### Critical Rules
-- **Test first** — Every behavioral change starts with a failing test. No exceptions without user approval. See `meld:meld-tdd` for the full Iron Law.
-- **Continuous execution** — Do NOT stop between tasks for approval
+- **Continuous execution** — Do NOT stop between tasks for approval. The human gate was Phase 2.
 - **Follow patterns** — Match existing codebase conventions exactly
 - **No gold-plating** — Implement exactly what's specified, nothing more
 
 ### Parallel Execution (Optional)
-
-When the task list contains 2+ independent tasks (different files, no shared state), MAY dispatch via `meld:meld-parallel-agents`. After all parallel agents complete, verify results with `meld:meld-verification`.
+When the task list contains 2+ independent tasks (different files, no shared state), MAY dispatch via `meld:meld-parallel-agents`.
 
 ### Halt Conditions
 ONLY halt for:
@@ -182,54 +190,21 @@ When halted, follow `meld:meld-debugging` before attempting more fixes. Do NOT g
 
 Do NOT halt for minor warnings, optional improvements, or deprecation notices.
 
-### Phase 3 Sync
+### Phase 3 Beads Sync
 If `{beads_active}` (after ALL tasks complete, not per-task):
-1. Read-merge-write metadata: merge `{"meld_step": "execute"}`
-2. `bd comment {ticket_id} "MELD quick-dev Phase 3 (Execute) complete — {completed_count}/{total_count} tasks implemented"`
+1. Merge metadata: `{"meld_step": "execute"}`
+2. `bd comment {ticket_id} "MELD quick-dev Phase 3 complete — {completed_count}/{total_count} tasks implemented"`
 
 ---
 
-## Phase 4: Code Simplification
+## Phase 4: Verify & Self-Check
 
-A fresh-context subagent reviews all modified code for clarity, consistency, and maintainability — catching blind spots the implementing agent misses.
+This phase combines self-audit with fresh verification evidence. The point: models are prone to claiming "done" based on memory or assumptions. Every claim needs proof from THIS session, AFTER the latest change.
 
 ### Skip Conditions
-Skip this phase if EITHER condition is true:
-- **Trivial diff:** fewer than 20 lines changed AND fewer than 3 files modified (check via `git diff --stat {baseline_commit}`)
-- **No test framework:** the project has no test runner (same exception as TDD in Phase 3)
+If the diff is trivial (fewer than 20 lines changed AND fewer than 3 files modified via `git diff --stat {baseline_commit}`), skip the full audit and just run the verification gate.
 
-If skipping, note the reason in the phase sync comment and proceed to Phase 5.
-
-### Identify Modified Files
-```bash
-git diff --name-only {baseline_commit}
-```
-Store the file list for the subagent prompt.
-
-### Invoke Code Simplifier Subagent
-Use the Task tool to dispatch a `code-simplifier` subagent with:
-- **Prompt:** Read `meld:meld-code-simplifier` SKILL.md content, then: "Simplify code modified since `{baseline_commit}`. Files: `{file_list}`. Read `CLAUDE.md` and `project-context.md` first for project conventions."
-- **Context:** The subagent receives ONLY the SKILL.md instructions, baseline commit, and file list — NO conversation history. This gives it fresh eyes on the code.
-
-### Review Simplifier Output
-Review each simplification (S1, S2...) from the subagent:
-- **Accept** changes that genuinely improve clarity or consistency
-- **Revert** any change that alters behavior, is questionable, or reduces readability
-- Use your judgement — the simplifier is advisory, not authoritative
-
-### Verify Tests Still Pass
-Run the full test suite after applying simplifications. If any test fails, revert the offending simplification and re-run.
-
-### Phase 4 Sync
-If `{beads_active}`:
-1. Read-merge-write metadata: merge `{"meld_step": "code-simplify"}`
-2. `bd comment {ticket_id} "MELD quick-dev Phase 4 (Code Simplification) complete — {accepted_count} simplifications accepted, {reverted_count} reverted"`
-
----
-
-## Phase 5: Self-Check
-
-### 12-Point Self-Audit
+### Self-Audit Checklist
 Verify each item honestly:
 
 **Tasks:**
@@ -240,35 +215,24 @@ Verify each item honestly:
 **Tests:**
 4. All existing tests still pass
 5. New tests written for new behavior
-6. Test coverage covers happy path
-7. Test coverage covers error/edge cases
+6. Test coverage covers happy path and error/edge cases
 
 **Acceptance Criteria:**
-8. Each AC is demonstrably satisfied
-9. Edge cases from ACs are handled
-10. Authorization/validation checks in place where specified
+7. Each AC is demonstrably satisfied
+8. Edge cases from ACs are handled
 
 **Patterns:**
-11. Code follows existing codebase conventions
-12. No code smells introduced (duplication, god objects, deep nesting)
+9. Code follows existing codebase conventions
+10. No code smells introduced (duplication, god objects, deep nesting)
 
 ### Verification Gate
 
-**REQUIRED:** Invoke `meld:meld-verification` gate function. Run the full test suite, linter, and build fresh. Read complete output. Match evidence to every claim from the 12-point audit above.
+**REQUIRED:** Invoke `meld:meld-verification` gate function. Run the full test suite, linter, and build fresh. Read complete output. Match evidence to every claim from the audit above.
 
 Any claim without fresh evidence? Go back and gather it.
 
 ### Handle Failures
 Fix immediately if possible. Re-run affected tests. If not fixable, document and flag for user.
-
-### Update Spec Artifact
-
-**If `{beads_active}`:**
-- Read-merge-write metadata: merge `{"meld_step": "self-check"}`
-- `bd comment {ticket_id} "MELD quick-dev Phase 5 (Self-Check) complete — {pass_count}/12 checks passing, {new_test_count} new tests"`
-
-**Otherwise (Mode A with local tech-spec):**
-- Update status to "Implementation Complete", mark all tasks `[x]`, add implementation notes if approach deviated.
 
 ### Present Summary
 - Tasks completed: N/N
@@ -276,35 +240,32 @@ Fix immediately if possible. Re-run affected tests. If not fixable, document and
 - Files modified/created
 - Checklist: all items passing (or flagged)
 
+### Phase 4 Beads Sync
+If `{beads_active}`:
+1. Merge metadata: `{"meld_step": "verify"}`
+2. `bd comment {ticket_id} "MELD quick-dev Phase 4 complete — {pass_count}/10 checks passing, {new_test_count} new tests"`
+3. Update spec artifact: mark tasks `[x]`, add implementation notes if approach deviated.
+
 ---
 
-## Phase 6: Adversarial Review
-
-**REQUIRED SUB-SKILL:** Use `meld:meld-adversarial-review` for the full review procedure.
+## Phase 5: Adversarial Review & Resolution
 
 ### Construct Diff
-From `baseline_commit`:
 ```bash
 git diff {baseline_commit}
 ```
 Include new files. Use NO_GIT fallback if needed.
 
 ### Invoke Review
-Use a subagent (Task tool) for true information asymmetry. The reviewer sees ONLY the diff and the reviewer prompt from `adversarial-reviewer-prompt.md` — NO spec, NO conversation history.
+**REQUIRED SUB-SKILL:** Use `meld:meld-adversarial-review` for the full procedure.
+
+Use a subagent (Task tool) for true information asymmetry. The reviewer sees ONLY the diff and the reviewer prompt — NO spec, NO conversation history. This is the whole point: you can't objectively review code you just wrote, so a fresh agent with no context catches what you're blind to.
 
 ### Process and Present Findings
 Number findings (F1, F2...) with severity and validity ratings. Order by severity. Flag zero findings as suspicious.
 
-### Phase 6 Sync
-If `{beads_active}`:
-1. Read-merge-write metadata: merge `{"meld_step": "adversarial-review", "finding_count": {total_findings}}`
-2. `bd comment {ticket_id} "MELD quick-dev Phase 6 (Adversarial Review) complete — {finding_count} findings ({critical_count} critical, {warning_count} warnings, {info_count} info)"`
-
----
-
-## Phase 7: Resolve Findings (Human Gate)
-
-### Present Options
+### Human Gate — Resolve Findings
+Present options:
 - **[W] Walk through** — Iterate each finding: Fix / Skip / Discuss
 - **[F] Fix automatically** — Fix all "Real" findings, skip Noise/Undecided
 - **[S] Skip** — Acknowledge and proceed
@@ -315,11 +276,9 @@ If `{beads_active}`:
 - **Skip:** Note findings for future reference
 
 ### Final Verification
-
 **REQUIRED:** Run `meld:meld-verification` gate function one last time. This catches regressions introduced during finding resolution.
 
 ### Worktree Completion
-
 If in a worktree, present completion options via `meld:meld-worktrees`:
 - **[P] Create Pull Request** — push branch and create PR
 - **[M] Merge to main** — merge branch and clean up worktree
@@ -328,15 +287,11 @@ If in a worktree, present completion options via `meld:meld-worktrees`:
 
 **Wait for user decision.**
 
-### Update Spec Artifact
-
-**If `{beads_active}`:**
-1. Read-merge-write metadata: merge `{"meld_phase": "done", "meld_step": "resolve-findings", "findings_fixed": {fixed_count}, "findings_skipped": {skipped_count}, "spec_status": "completed"}`
-2. `bd comment {ticket_id} "MELD quick-dev Phase 7 (Resolve Findings) complete — implementation done. {fixed_count} findings fixed, {skipped_count} skipped. All tests passing."`
+### Phase 5 Beads Sync
+If `{beads_active}`:
+1. Merge metadata: `{"meld_phase": "done", "meld_step": "resolve-findings", "finding_count": {total}, "findings_fixed": {fixed_count}, "findings_skipped": {skipped_count}, "spec_status": "completed"}`
+2. `bd comment {ticket_id} "MELD quick-dev Phase 5 complete — {finding_count} findings ({fixed_count} fixed, {skipped_count} skipped). All tests passing."`
 3. Ask user: "Implementation is complete. Close this ticket? (`bd close {ticket_id} --reason 'Implementation complete — {summary}'`)"
-
-**Otherwise (Mode A with local tech-spec):**
-- Update status to "Completed". Add review notes: finding count, fixed count, skipped count.
 
 ### Completion Summary
 - Files modified/created

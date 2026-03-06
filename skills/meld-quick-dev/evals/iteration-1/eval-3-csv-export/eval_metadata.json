@@ -1,0 +1,13 @@
+{
+  "eval_id": 3,
+  "eval_name": "mode-a-spec-driven-csv",
+  "prompt": "Implement the following tech spec with status: ready-for-dev, 3 acceptance criteria, and 5 tasks for CSV export functionality.",
+  "assertions": [
+    {"text": "Correctly identifies Mode A (tech spec provided)", "type": "boolean"},
+    {"text": "Skips Phase 2 (context gathering) entirely", "type": "boolean"},
+    {"text": "Executes all 5 tasks from the spec", "type": "boolean"},
+    {"text": "Plans TDD (RED-GREEN-REFACTOR) for each task", "type": "boolean"},
+    {"text": "References acceptance criteria during verification", "type": "boolean"},
+    {"text": "Does not stop to re-plan or ask unnecessary questions", "type": "boolean"}
+  ]
+}

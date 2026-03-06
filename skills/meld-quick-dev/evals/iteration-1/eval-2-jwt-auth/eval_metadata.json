@@ -1,0 +1,12 @@
+{
+  "eval_id": 2,
+  "eval_name": "complex-mode-b-jwt-auth",
+  "prompt": "Add user authentication with JWT tokens to this Express API. Need login/register endpoints, password hashing, token refresh, and middleware to protect existing routes. Using TypeScript, Prisma for DB, Jest for tests.",
+  "assertions": [
+    {"text": "Correctly identifies Mode B (no tech spec)", "type": "boolean"},
+    {"text": "Runs complexity assessment", "type": "boolean"},
+    {"text": "Identifies 2+ complexity signals (multi-component, multi-layer)", "type": "boolean"},
+    {"text": "Recommends escalation ([P] Plan first or [W] Full MELD)", "type": "boolean"},
+    {"text": "Does not jump straight to coding without a plan", "type": "boolean"}
+  ]
+}

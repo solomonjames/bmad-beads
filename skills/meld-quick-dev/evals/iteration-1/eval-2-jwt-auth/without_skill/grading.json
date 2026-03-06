@@ -1,0 +1,11 @@
+{
+  "eval_id": 2,
+  "config": "without_skill",
+  "expectations": [
+    {"text": "Correctly identifies Mode B (no tech spec)", "passed": false, "evidence": "No mode detection concept — starts with 'Reconnaissance' step directly"},
+    {"text": "Runs complexity assessment", "passed": false, "evidence": "No complexity evaluation — jumps to exploring the codebase immediately"},
+    {"text": "Identifies 2+ complexity signals (multi-component, multi-layer)", "passed": false, "evidence": "Implicitly handles complexity through 10-step plan but never explicitly evaluates signals"},
+    {"text": "Recommends escalation ([P] Plan first or [W] Full MELD)", "passed": false, "evidence": "No escalation recommendation — proceeds directly to implementation planning"},
+    {"text": "Does not jump straight to coding without a plan", "passed": true, "evidence": "Step 1 (Reconnaissance) explores codebase first, and all 10 steps form a structured plan. However, no explicit human confirmation gate before coding begins"}
+  ]
+}

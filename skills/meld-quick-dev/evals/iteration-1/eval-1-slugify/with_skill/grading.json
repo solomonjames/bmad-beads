@@ -1,0 +1,13 @@
+{
+  "eval_id": 1,
+  "config": "with_skill",
+  "expectations": [
+    {"text": "Correctly identifies Mode B (no tech spec)", "passed": true, "evidence": "Explicitly states 'Decision: Mode B (Direct Instructions)' with reasoning about no tech-spec and no beads ticket"},
+    {"text": "Runs complexity assessment before diving in", "passed": true, "evidence": "Invokes meld:meld-complexity-assessment, evaluates scope/unknowns/risk/dependencies/cross-cutting, concludes 'Low (Simple)'"},
+    {"text": "Routes to [E] Execute for low complexity", "passed": true, "evidence": "Presents three options [P/W/E], recommends [E] Execute directly, simulated user confirms"},
+    {"text": "Creates implementation plan before writing code", "passed": true, "evidence": "Phase 2 produces ordered task list, inferred ACs (8 criteria), files to modify, and presents for user confirmation"},
+    {"text": "Plans TDD approach (test-first RED-GREEN-REFACTOR)", "passed": true, "evidence": "Phase 3 follows RED (8 failing tests) → GREEN (implementation) → REFACTOR sequence explicitly"},
+    {"text": "Reads existing string-helpers.ts for patterns", "passed": true, "evidence": "Phase 2 reads string-helpers.ts, notes naming conventions (camelCase, JSDoc), export patterns, test patterns"},
+    {"text": "Includes verification/self-check before claiming done", "passed": true, "evidence": "Phase 4 runs 10-point self-audit + meld:meld-verification gate with fresh test/lint/build runs"}
+  ]
+}
