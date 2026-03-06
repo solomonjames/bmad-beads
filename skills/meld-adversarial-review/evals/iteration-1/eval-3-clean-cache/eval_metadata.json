@@ -1,0 +1,13 @@
+{
+  "eval_id": 3,
+  "eval_name": "clean-cache",
+  "prompt": "Just finished a TTL cache implementation with tests. Baseline commit is ghi9012. Please perform an adversarial review.",
+  "assertions": [
+    "The review identifies at least 1 finding (code is not perfect)",
+    "The review mentions the time.sleep in tests as a potential concern",
+    "Findings are ordered by severity (Critical/High before Medium/Low)",
+    "Each finding includes a file location reference",
+    "The review uses the F{N} [{Severity}] format for findings",
+    "The review process uses a subagent (Task tool) for information asymmetry"
+  ]
+}

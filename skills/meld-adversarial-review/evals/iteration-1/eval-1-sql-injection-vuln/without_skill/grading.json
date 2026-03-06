@@ -1,0 +1,48 @@
+{
+  "expectations": [
+    {
+      "text": "The review identifies SQL injection as a Critical finding",
+      "passed": true,
+      "evidence": "SQL injection in all 4 queries identified as Critical severity"
+    },
+    {
+      "text": "The review identifies at least 4 distinct findings total",
+      "passed": true,
+      "evidence": "10 findings total across Critical, Significant, and Minor categories"
+    },
+    {
+      "text": "Findings are ordered by severity (Critical/High before Medium/Low)",
+      "passed": true,
+      "evidence": "Grouped under Critical Issues, Significant Issues, Minor Issues headings"
+    },
+    {
+      "text": "Each finding includes a file location reference",
+      "passed": true,
+      "evidence": "Most findings reference specific line numbers (e.g., Line 22, Line 32)"
+    },
+    {
+      "text": "The review uses the F{N} [{Severity}] format for findings",
+      "passed": false,
+      "evidence": "Uses numbered headings (### 1. SQL Injection...) with severity categories, not F{N} format"
+    },
+    {
+      "text": "The review identifies the missing/empty test stubs as a finding",
+      "passed": true,
+      "evidence": "Issue #10 'Test Coverage Gaps' mentions DELETE suite is empty with TODO comment"
+    },
+    {
+      "text": "The review process uses a subagent (Task tool) for information asymmetry",
+      "passed": false,
+      "evidence": "No subagent expected for baseline (without_skill) run"
+    }
+  ],
+  "summary": {
+    "passed": 5,
+    "failed": 2,
+    "total": 7,
+    "pass_rate": 0.71
+  },
+  "timing": {
+    "total_duration_seconds": 56.2
+  }
+}

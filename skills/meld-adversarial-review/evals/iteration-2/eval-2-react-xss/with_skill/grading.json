@@ -1,0 +1,15 @@
+{
+  "expectations": [
+    {"text": "XSS via dangerouslySetInnerHTML as Critical/High", "passed": true, "evidence": "F1 [Critical/Real]"},
+    {"text": "At least 3 distinct findings", "passed": true, "evidence": "9 findings total"},
+    {"text": "Severity-ordered findings", "passed": true, "evidence": "Critical > High > Medium > Low"},
+    {"text": "File location references", "passed": true, "evidence": "Location: lines on all findings"},
+    {"text": "F{N} [{Severity}] format", "passed": true, "evidence": "F1 [Critical/Real] through F9 [Low/Real]"},
+    {"text": "Stale closure / missing useEffect dep", "passed": true, "evidence": "F2 identifies stale closure and missing deps"},
+    {"text": "Subagent used for information asymmetry", "passed": false, "evidence": "Inline fallback - Agent tool unavailable to subagents"},
+    {"text": "Validity labels on findings", "passed": true, "evidence": "All 9 labeled Real"},
+    {"text": "Summary table with severity/validity", "passed": true, "evidence": "Summary Table with Severity/Count/Real/Undecided/Noise"},
+    {"text": "Resolution options [W], [F], [S]", "passed": true, "evidence": "Resolution Options present with Walk/Fix/Skip"}
+  ],
+  "summary": {"passed": 9, "failed": 1, "total": 10, "pass_rate": 0.90}
+}

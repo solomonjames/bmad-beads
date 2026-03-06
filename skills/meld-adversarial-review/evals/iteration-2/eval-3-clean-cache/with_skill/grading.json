@@ -1,0 +1,14 @@
+{
+  "expectations": [
+    {"text": "At least 1 finding identified", "passed": true, "evidence": "7 findings, 4 Real"},
+    {"text": "time.sleep concern mentioned", "passed": true, "evidence": "F1 [High/Real] identifies time.sleep issue"},
+    {"text": "Severity-ordered findings", "passed": true, "evidence": "High > Medium > Low ordering"},
+    {"text": "File location references", "passed": true, "evidence": "Location: lines present on all findings"},
+    {"text": "F{N} [{Severity}] format", "passed": true, "evidence": "F1 [High/Real] through F7 [Low/Noise]"},
+    {"text": "Subagent used for information asymmetry", "passed": false, "evidence": "Inline fallback - Agent tool unavailable to subagents"},
+    {"text": "Validity labels on findings", "passed": true, "evidence": "4 Real, 2 Undecided, 1 Noise labeled"},
+    {"text": "Summary table with severity/validity", "passed": true, "evidence": "Summary Table with correct columns present"},
+    {"text": "Resolution options [W], [F], [S]", "passed": true, "evidence": "Resolution Options with Walk/Fix/Skip present"}
+  ],
+  "summary": {"passed": 8, "failed": 1, "total": 9, "pass_rate": 0.89}
+}

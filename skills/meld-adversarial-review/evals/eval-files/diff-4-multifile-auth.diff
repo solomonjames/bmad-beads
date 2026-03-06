@@ -1,0 +1,185 @@
+diff --git a/src/middleware/auth.ts b/src/middleware/auth.ts
+new file mode 100644
+index 0000000..abc1111
+--- /dev/null
++++ b/src/middleware/auth.ts
+@@ -0,0 +1,38 @@
++import jwt from 'jsonwebtoken';
++import { Request, Response, NextFunction } from 'express';
++
++const JWT_SECRET = 'super-secret-key-do-not-share';
++
++export interface AuthRequest extends Request {
++  user?: { id: string; email: string; role: string };
++}
++
++export function authenticate(req: AuthRequest, res: Response, next: NextFunction) {
++  const token = req.headers.authorization?.split(' ')[1];
++
++  if (!token) {
++    return res.status(401).json({ error: 'No token provided' });
++  }
++
++  try {
++    const decoded = jwt.verify(token, JWT_SECRET) as any;
++    req.user = decoded;
++    next();
++  } catch (err) {
++    return res.status(401).json({ error: 'Invalid token' });
++  }
++}
++
++export function authorize(...roles: string[]) {
++  return (req: AuthRequest, res: Response, next: NextFunction) => {
++    if (!req.user) {
++      return res.status(401).json({ error: 'Not authenticated' });
++    }
++    if (!roles.includes(req.user.role)) {
++      return res.status(403).json({ error: 'Insufficient permissions' });
++    }
++    next();
++  };
++}
++
++export function generateToken(user: { id: string; email: string; role: string }): string {
++  return jwt.sign(user, JWT_SECRET, { expiresIn: '24h' });
++}
+diff --git a/src/routes/admin.ts b/src/routes/admin.ts
+new file mode 100644
+index 0000000..abc2222
+--- /dev/null
++++ b/src/routes/admin.ts
+@@ -0,0 +1,47 @@
++import { Router } from 'express';
++import { authenticate, authorize, AuthRequest } from '../middleware/auth';
++import { db } from '../db';
++
++const router = Router();
++
++router.use(authenticate);
++
++router.get('/admin/users', authorize('admin'), async (req: AuthRequest, res) => {
++  const users = await db.query('SELECT id, name, email, role FROM users');
++  res.json(users.rows);
++});
++
++router.put('/admin/users/:id/role', authorize('admin'), async (req: AuthRequest, res) => {
++  const { id } = req.params;
++  const { role } = req.body;
++
++  await db.query('UPDATE users SET role = $1 WHERE id = $2', [role, id]);
++  res.json({ success: true });
++});
++
++router.delete('/admin/users/:id', authorize('admin'), async (req: AuthRequest, res) => {
++  const { id } = req.params;
++  const adminId = req.user!.id;
++
++  // Prevent self-deletion
++  if (id === adminId) {
++    return res.status(400).json({ error: 'Cannot delete yourself' });
++  }
++
++  await db.query('DELETE FROM users WHERE id = $1', [id]);
++  res.json({ success: true });
++});
++
++router.get('/admin/audit-log', authorize('admin', 'auditor'), async (req: AuthRequest, res) => {
++  const { startDate, endDate, action } = req.query;
++
++  let query = 'SELECT * FROM audit_log WHERE 1=1';
++  const params: any[] = [];
++
++  if (startDate) { query += ` AND created_at >= '${startDate}'`; params.push(startDate); }
++  if (endDate) { query += ` AND created_at <= '${endDate}'`; params.push(endDate); }
++  if (action) { query += ` AND action = '${action}'`; params.push(action); }
++
++  const logs = await db.query(query, params);
++  res.json(logs.rows);
++});
++
++export default router;
+diff --git a/src/routes/profile.ts b/src/routes/profile.ts
+new file mode 100644
+index 0000000..abc3333
+--- /dev/null
++++ b/src/routes/profile.ts
+@@ -0,0 +1,42 @@
++import { Router } from 'express';
++import { authenticate, AuthRequest } from '../middleware/auth';
++import { db } from '../db';
++import { hashPassword } from '../utils/crypto';
++
++const router = Router();
++
++router.use(authenticate);
++
++router.get('/profile', async (req: AuthRequest, res) => {
++  const result = await db.query('SELECT * FROM users WHERE id = $1', [req.user!.id]);
++  res.json(result.rows[0]);
++});
++
++router.put('/profile', async (req: AuthRequest, res) => {
++  const { name, email, bio } = req.body;
++  const result = await db.query(
++    'UPDATE users SET name = $1, email = $2, bio = $3 WHERE id = $4 RETURNING *',
++    [name, email, bio, req.user!.id]
++  );
++  res.json(result.rows[0]);
++});
++
++router.put('/profile/password', async (req: AuthRequest, res) => {
++  const { currentPassword, newPassword } = req.body;
++
++  // Get current user
++  const user = await db.query('SELECT password FROM users WHERE id = $1', [req.user!.id]);
++
++  // Just update without verifying current password
++  const hashed = await hashPassword(newPassword);
++  await db.query('UPDATE users SET password = $1 WHERE id = $2', [hashed, req.user!.id]);
++
++  res.json({ success: true });
++});
++
++router.delete('/profile', async (req: AuthRequest, res) => {
++  await db.query('DELETE FROM users WHERE id = $1', [req.user!.id]);
++  res.json({ success: true });
++});
++
++export default router;
+diff --git a/tests/auth.test.ts b/tests/auth.test.ts
+new file mode 100644
+index 0000000..abc4444
+--- /dev/null
++++ b/tests/auth.test.ts
+@@ -0,0 +1,28 @@
++import { generateToken, authenticate } from '../src/middleware/auth';
++import jwt from 'jsonwebtoken';
++
++describe('Auth middleware', () => {
++  it('should generate a valid JWT', () => {
++    const user = { id: '1', email: 'test@test.com', role: 'user' };
++    const token = generateToken(user);
++    const decoded = jwt.verify(token, 'super-secret-key-do-not-share') as any;
++    expect(decoded.id).toBe('1');
++    expect(decoded.email).toBe('test@test.com');
++  });
++
++  it('should reject requests without token', () => {
++    const req = { headers: {} } as any;
++    const res = { status: jest.fn().mockReturnThis(), json: jest.fn() } as any;
++    const next = jest.fn();
++
++    authenticate(req, res, next);
++    expect(res.status).toHaveBeenCalledWith(401);
++    expect(next).not.toHaveBeenCalled();
++  });
++});
++
++describe('Admin routes', () => {
++  // TODO: test admin endpoints
++});
++
++describe('Profile routes', () => {
++  // TODO: test profile endpoints
++});

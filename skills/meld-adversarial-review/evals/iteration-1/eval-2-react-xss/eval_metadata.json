@@ -1,0 +1,14 @@
+{
+  "eval_id": 2,
+  "eval_name": "react-xss",
+  "prompt": "Implementation of the Dashboard component is done. Baseline commit is def5678. Run an adversarial review on the diff.",
+  "assertions": [
+    "The review identifies XSS via dangerouslySetInnerHTML as Critical or High",
+    "The review identifies at least 3 distinct findings total",
+    "Findings are ordered by severity (Critical/High before Medium/Low)",
+    "Each finding includes a file location reference",
+    "The review uses the F{N} [{Severity}] format for findings",
+    "The review identifies the stale closure or missing dependency in useEffect",
+    "The review process uses a subagent (Task tool) for information asymmetry"
+  ]
+}

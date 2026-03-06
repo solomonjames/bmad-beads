@@ -1,0 +1,125 @@
+diff --git a/src/components/Dashboard.tsx b/src/components/Dashboard.tsx
+new file mode 100644
+index 0000000..abcdef1
+--- /dev/null
++++ b/src/components/Dashboard.tsx
+@@ -0,0 +1,89 @@
++import React, { useState, useEffect } from 'react';
++import { fetchMetrics } from '../api/metrics';
++import { Chart } from './Chart';
++import { MetricCard } from './MetricCard';
++
++interface DashboardProps {
++  userId: string;
++  refreshInterval?: number;
++}
++
++export const Dashboard: React.FC<DashboardProps> = ({ userId, refreshInterval = 30000 }) => {
++  const [metrics, setMetrics] = useState<any>(null);
++  const [loading, setLoading] = useState(true);
++  const [error, setError] = useState<string | null>(null);
++  const [selectedPeriod, setSelectedPeriod] = useState('7d');
++
++  useEffect(() => {
++    loadMetrics();
++    const interval = setInterval(loadMetrics, refreshInterval);
++    return () => clearInterval(interval);
++  }, [selectedPeriod]);
++
++  const loadMetrics = async () => {
++    try {
++      const data = await fetchMetrics(userId, selectedPeriod);
++      setMetrics(data);
++      setLoading(false);
++    } catch (err) {
++      setError('Failed to load metrics');
++      setLoading(false);
++    }
++  };
++
++  if (loading) return <div>Loading...</div>;
++  if (error) return <div className="error">{error}</div>;
++
++  return (
++    <div className="dashboard">
++      <div className="dashboard-header">
++        <h1>Dashboard</h1>
++        <select value={selectedPeriod} onChange={(e) => setSelectedPeriod(e.target.value)}>
++          <option value="1d">Last 24 hours</option>
++          <option value="7d">Last 7 days</option>
++          <option value="30d">Last 30 days</option>
++          <option value="90d">Last 90 days</option>
++        </select>
++      </div>
++
++      <div className="metrics-grid">
++        <MetricCard title="Revenue" value={`$${metrics.revenue}`} />
++        <MetricCard title="Users" value={metrics.activeUsers} />
++        <MetricCard title="Conversion" value={`${metrics.conversionRate}%`} />
++        <MetricCard title="Churn" value={`${metrics.churnRate}%`} />
++      </div>
++
++      <div className="charts">
++        <Chart
++          data={metrics.revenueHistory}
++          type="line"
++          title="Revenue Over Time"
++        />
++        <Chart
++          data={metrics.userGrowth}
++          type="bar"
++          title="User Growth"
++        />
++      </div>
++
++      <div className="recent-activity">
++        <h2>Recent Activity</h2>
++        <ul>
++          {metrics.recentEvents.map((event) => (
++            <li key={event.id}>
++              <span dangerouslySetInnerHTML={{ __html: event.description }} />
++              <time>{new Date(event.timestamp).toLocaleDateString()}</time>
++            </li>
++          ))}
++        </ul>
++      </div>
++    </div>
++  );
++};
+diff --git a/src/components/__tests__/Dashboard.test.tsx b/src/components/__tests__/Dashboard.test.tsx
+new file mode 100644
+index 0000000..abcdef2
+--- /dev/null
++++ b/src/components/__tests__/Dashboard.test.tsx
+@@ -0,0 +1,30 @@
++import { render, screen, waitFor } from '@testing-library/react';
++import { Dashboard } from '../Dashboard';
++import { fetchMetrics } from '../../api/metrics';
++
++jest.mock('../../api/metrics');
++
++const mockMetrics = {
++  revenue: 50000,
++  activeUsers: 1200,
++  conversionRate: 3.5,
++  churnRate: 2.1,
++  revenueHistory: [],
++  userGrowth: [],
++  recentEvents: [],
++};
++
++describe('Dashboard', () => {
++  beforeEach(() => {
++    (fetchMetrics as jest.Mock).mockResolvedValue(mockMetrics);
++  });
++
++  it('renders loading state', () => {
++    render(<Dashboard userId="123" />);
++    expect(screen.getByText('Loading...')).toBeInTheDocument();
++  });
++
++  it('renders metrics after loading', async () => {
++    render(<Dashboard userId="123" />);
++    await waitFor(() => expect(screen.getByText('$50000')).toBeInTheDocument());
++  });
++});

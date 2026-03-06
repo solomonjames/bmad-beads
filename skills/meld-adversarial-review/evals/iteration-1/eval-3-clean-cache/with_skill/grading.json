@@ -1,0 +1,43 @@
+{
+  "expectations": [
+    {
+      "text": "The review identifies at least 1 finding (code is not perfect)",
+      "passed": true,
+      "evidence": "7 findings total, 3 classified as Real"
+    },
+    {
+      "text": "The review mentions the time.sleep in tests as a potential concern",
+      "passed": true,
+      "evidence": "F4 [Medium/Real] -- Tests use time.sleep() instead of mocking, making them slow and flaky"
+    },
+    {
+      "text": "Findings are ordered by severity (Critical/High before Medium/Low)",
+      "passed": true,
+      "evidence": "Final summary reordered by validity (Real first) and severity (Medium before Low)"
+    },
+    {
+      "text": "Each finding includes a file location reference",
+      "passed": true,
+      "evidence": "All findings include Location: lines (e.g., lib/cache.py:52-56)"
+    },
+    {
+      "text": "The review uses the F{N} [{Severity}] format for findings",
+      "passed": true,
+      "evidence": "All findings use F1 [Medium], F2 [Medium], etc. with validity added in summary"
+    },
+    {
+      "text": "The review process uses a subagent (Task tool) for information asymmetry",
+      "passed": false,
+      "evidence": "Agent stated 'The Agent tool was not available' and performed inline review"
+    }
+  ],
+  "summary": {
+    "passed": 5,
+    "failed": 1,
+    "total": 6,
+    "pass_rate": 0.83
+  },
+  "timing": {
+    "total_duration_seconds": 95.6
+  }
+}

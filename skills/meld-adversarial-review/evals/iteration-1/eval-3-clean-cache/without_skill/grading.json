@@ -1,0 +1,43 @@
+{
+  "expectations": [
+    {
+      "text": "The review identifies at least 1 finding (code is not perfect)",
+      "passed": true,
+      "evidence": "9 findings across Critical, Moderate, and Minor categories"
+    },
+    {
+      "text": "The review mentions the time.sleep in tests as a potential concern",
+      "passed": true,
+      "evidence": "Issue #3: time.sleep() in tests makes the suite slow and flaky"
+    },
+    {
+      "text": "Findings are ordered by severity (Critical/High before Medium/Low)",
+      "passed": true,
+      "evidence": "Grouped under Critical Issues, Moderate Issues, Minor Issues headings"
+    },
+    {
+      "text": "Each finding includes a file location reference",
+      "passed": true,
+      "evidence": "Most findings include file and line references"
+    },
+    {
+      "text": "The review uses the F{N} [{Severity}] format for findings",
+      "passed": false,
+      "evidence": "Uses numbered headings (### 1. _evict_expired...) with severity section headers, not F{N} format"
+    },
+    {
+      "text": "The review process uses a subagent (Task tool) for information asymmetry",
+      "passed": false,
+      "evidence": "No subagent expected for baseline (without_skill) run"
+    }
+  ],
+  "summary": {
+    "passed": 4,
+    "failed": 2,
+    "total": 6,
+    "pass_rate": 0.67
+  },
+  "timing": {
+    "total_duration_seconds": 57.6
+  }
+}

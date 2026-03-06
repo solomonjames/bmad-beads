@@ -1,0 +1,48 @@
+{
+  "expectations": [
+    {
+      "text": "The review identifies XSS via dangerouslySetInnerHTML as Critical or High",
+      "passed": true,
+      "evidence": "Issue #1 CRITICAL: XSS Vulnerability via dangerouslySetInnerHTML"
+    },
+    {
+      "text": "The review identifies at least 3 distinct findings total",
+      "passed": true,
+      "evidence": "8 findings total across Critical, High, Medium, Low categories"
+    },
+    {
+      "text": "Findings are ordered by severity (Critical/High before Medium/Low)",
+      "passed": true,
+      "evidence": "Grouped under CRITICAL, HIGH, MEDIUM, LOW headings in order"
+    },
+    {
+      "text": "Each finding includes a file location reference",
+      "passed": true,
+      "evidence": "Each finding includes File: and line number references"
+    },
+    {
+      "text": "The review uses the F{N} [{Severity}] format for findings",
+      "passed": false,
+      "evidence": "Uses numbered headings (### 1. XSS...) with severity section headers, not F{N} format"
+    },
+    {
+      "text": "The review identifies the stale closure or missing dependency in useEffect",
+      "passed": true,
+      "evidence": "Issue #2 HIGH: Missing loadMetrics and refreshInterval in useEffect dependency array"
+    },
+    {
+      "text": "The review process uses a subagent (Task tool) for information asymmetry",
+      "passed": false,
+      "evidence": "No subagent expected for baseline (without_skill) run"
+    }
+  ],
+  "summary": {
+    "passed": 5,
+    "failed": 2,
+    "total": 7,
+    "pass_rate": 0.71
+  },
+  "timing": {
+    "total_duration_seconds": 47.5
+  }
+}

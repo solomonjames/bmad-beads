@@ -1,0 +1,17 @@
+{
+  "eval_id": 4,
+  "eval_name": "multifile-auth",
+  "prompt": "Finished the auth middleware, admin routes, and profile routes. Baseline commit is jkl3456. Please do an adversarial review of the full diff.",
+  "assertions": [
+    "The review identifies the hardcoded JWT secret as Critical or High",
+    "The review identifies SQL injection in the audit-log endpoint",
+    "The review identifies that password change skips current password verification",
+    "The review identifies at least 5 distinct findings total",
+    "Findings are ordered by severity (Critical/High before Medium/Low)",
+    "The review uses the F{N} [{Severity}] format for findings",
+    "The review process uses a subagent (Agent tool) for information asymmetry",
+    "Each finding is classified with a validity label (Real, Noise, or Undecided)",
+    "The output includes a summary table with severity counts and validity breakdown",
+    "The output presents resolution options [W], [F], [S] at the end"
+  ]
+}

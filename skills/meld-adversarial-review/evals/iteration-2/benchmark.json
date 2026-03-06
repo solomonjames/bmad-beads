@@ -1,0 +1,164 @@
+{
+  "metadata": {
+    "skill_name": "meld-adversarial-review",
+    "skill_path": "/Users/jamessolomon/src/solomonjames/bmad-beads/skills/meld-adversarial-review",
+    "timestamp": "2026-03-05T13:00:00Z",
+    "evals_run": [1, 2, 3, 4],
+    "runs_per_configuration": 1
+  },
+  "runs": [
+    {
+      "eval_id": 1, "eval_name": "sql-injection-vuln", "configuration": "with_skill", "run_number": 1,
+      "result": {"pass_rate": 0.90, "passed": 9, "failed": 1, "total": 10, "time_seconds": 76.8, "tokens": 19406, "tool_calls": 8, "errors": 0},
+      "expectations": [
+        {"text": "SQL injection as Critical", "passed": true, "evidence": "F1-F4 Critical/Real"},
+        {"text": "4+ findings", "passed": true, "evidence": "14 findings"},
+        {"text": "Severity-ordered", "passed": true, "evidence": "Critical>High>Medium>Low"},
+        {"text": "File locations", "passed": true, "evidence": "All present"},
+        {"text": "F{N} format", "passed": true, "evidence": "Correct"},
+        {"text": "Empty test stubs", "passed": true, "evidence": "F10"},
+        {"text": "Subagent used", "passed": false, "evidence": "Inline fallback"},
+        {"text": "Validity labels", "passed": true, "evidence": "All labeled"},
+        {"text": "Summary table", "passed": true, "evidence": "Present"},
+        {"text": "Resolution options", "passed": true, "evidence": "W/F/S present"}
+      ]
+    },
+    {
+      "eval_id": 1, "eval_name": "sql-injection-vuln", "configuration": "without_skill", "run_number": 1,
+      "result": {"pass_rate": 0.40, "passed": 4, "failed": 6, "total": 10, "time_seconds": 53.8, "tokens": 12278, "tool_calls": 5, "errors": 0},
+      "expectations": [
+        {"text": "SQL injection as Critical", "passed": true, "evidence": "CRITICAL heading"},
+        {"text": "4+ findings", "passed": true, "evidence": "9 findings"},
+        {"text": "Severity-ordered", "passed": true, "evidence": "Grouped"},
+        {"text": "File locations", "passed": true, "evidence": "Present"},
+        {"text": "F{N} format", "passed": false, "evidence": "Numbered headings"},
+        {"text": "Empty test stubs", "passed": true, "evidence": "Issue #9"},
+        {"text": "Subagent used", "passed": false, "evidence": "N/A"},
+        {"text": "Validity labels", "passed": false, "evidence": "None"},
+        {"text": "Summary table", "passed": false, "evidence": "None"},
+        {"text": "Resolution options", "passed": false, "evidence": "Verdict instead"}
+      ]
+    },
+    {
+      "eval_id": 2, "eval_name": "react-xss", "configuration": "with_skill", "run_number": 1,
+      "result": {"pass_rate": 0.90, "passed": 9, "failed": 1, "total": 10, "time_seconds": 69.1, "tokens": 19637, "tool_calls": 10, "errors": 0},
+      "expectations": [
+        {"text": "XSS as Critical/High", "passed": true, "evidence": "F1 Critical/Real"},
+        {"text": "3+ findings", "passed": true, "evidence": "9 findings"},
+        {"text": "Severity-ordered", "passed": true, "evidence": "Correct"},
+        {"text": "File locations", "passed": true, "evidence": "All present"},
+        {"text": "F{N} format", "passed": true, "evidence": "Correct"},
+        {"text": "Stale closure", "passed": true, "evidence": "F2"},
+        {"text": "Subagent used", "passed": false, "evidence": "Inline fallback"},
+        {"text": "Validity labels", "passed": true, "evidence": "All Real"},
+        {"text": "Summary table", "passed": true, "evidence": "Present"},
+        {"text": "Resolution options", "passed": true, "evidence": "W/F/S present"}
+      ]
+    },
+    {
+      "eval_id": 2, "eval_name": "react-xss", "configuration": "without_skill", "run_number": 1,
+      "result": {"pass_rate": 0.40, "passed": 4, "failed": 6, "total": 10, "time_seconds": 42.5, "tokens": 8933, "tool_calls": 4, "errors": 0},
+      "expectations": [
+        {"text": "XSS as Critical/High", "passed": true, "evidence": "CRITICAL"},
+        {"text": "3+ findings", "passed": true, "evidence": "8 findings"},
+        {"text": "Severity-ordered", "passed": true, "evidence": "Grouped"},
+        {"text": "File locations", "passed": true, "evidence": "Present"},
+        {"text": "F{N} format", "passed": false, "evidence": "Numbered headings"},
+        {"text": "Stale closure", "passed": true, "evidence": "Issue #2"},
+        {"text": "Subagent used", "passed": false, "evidence": "N/A"},
+        {"text": "Validity labels", "passed": false, "evidence": "None"},
+        {"text": "Summary table", "passed": false, "evidence": "No validity columns"},
+        {"text": "Resolution options", "passed": false, "evidence": "None"}
+      ]
+    },
+    {
+      "eval_id": 3, "eval_name": "clean-cache", "configuration": "with_skill", "run_number": 1,
+      "result": {"pass_rate": 0.89, "passed": 8, "failed": 1, "total": 9, "time_seconds": 73.1, "tokens": 19400, "tool_calls": 10, "errors": 0},
+      "expectations": [
+        {"text": "1+ finding", "passed": true, "evidence": "7 findings"},
+        {"text": "time.sleep concern", "passed": true, "evidence": "F1"},
+        {"text": "Severity-ordered", "passed": true, "evidence": "Correct"},
+        {"text": "File locations", "passed": true, "evidence": "Present"},
+        {"text": "F{N} format", "passed": true, "evidence": "Correct"},
+        {"text": "Subagent used", "passed": false, "evidence": "Inline fallback"},
+        {"text": "Validity labels", "passed": true, "evidence": "4R/2U/1N"},
+        {"text": "Summary table", "passed": true, "evidence": "Present"},
+        {"text": "Resolution options", "passed": true, "evidence": "W/F/S present"}
+      ]
+    },
+    {
+      "eval_id": 3, "eval_name": "clean-cache", "configuration": "without_skill", "run_number": 1,
+      "result": {"pass_rate": 0.44, "passed": 4, "failed": 5, "total": 9, "time_seconds": 52.4, "tokens": 8996, "tool_calls": 4, "errors": 0},
+      "expectations": [
+        {"text": "1+ finding", "passed": true, "evidence": "9 findings"},
+        {"text": "time.sleep concern", "passed": true, "evidence": "Issue #3"},
+        {"text": "Severity-ordered", "passed": true, "evidence": "Grouped"},
+        {"text": "File locations", "passed": true, "evidence": "Present"},
+        {"text": "F{N} format", "passed": false, "evidence": "Numbered headings"},
+        {"text": "Subagent used", "passed": false, "evidence": "N/A"},
+        {"text": "Validity labels", "passed": false, "evidence": "None"},
+        {"text": "Summary table", "passed": false, "evidence": "None"},
+        {"text": "Resolution options", "passed": false, "evidence": "Actions list instead"}
+      ]
+    },
+    {
+      "eval_id": 4, "eval_name": "multifile-auth", "configuration": "with_skill", "run_number": 1,
+      "result": {"pass_rate": 0.90, "passed": 9, "failed": 1, "total": 10, "time_seconds": 89.6, "tokens": 21078, "tool_calls": 9, "errors": 0},
+      "expectations": [
+        {"text": "Hardcoded JWT secret", "passed": true, "evidence": "F2 Critical/Real"},
+        {"text": "SQL injection in audit-log", "passed": true, "evidence": "F1 Critical/Real"},
+        {"text": "Password change skips verification", "passed": true, "evidence": "F3 High/Real"},
+        {"text": "5+ findings", "passed": true, "evidence": "12 findings"},
+        {"text": "Severity-ordered", "passed": true, "evidence": "Correct"},
+        {"text": "F{N} format", "passed": true, "evidence": "Correct"},
+        {"text": "Subagent used", "passed": false, "evidence": "Inline fallback"},
+        {"text": "Validity labels", "passed": true, "evidence": "9R/2U/1N"},
+        {"text": "Summary table", "passed": true, "evidence": "Present"},
+        {"text": "Resolution options", "passed": true, "evidence": "W/F/S present"}
+      ]
+    },
+    {
+      "eval_id": 4, "eval_name": "multifile-auth", "configuration": "without_skill", "run_number": 1,
+      "result": {"pass_rate": 0.50, "passed": 5, "failed": 5, "total": 10, "time_seconds": 61.0, "tokens": 10763, "tool_calls": 4, "errors": 0},
+      "expectations": [
+        {"text": "Hardcoded JWT secret", "passed": true, "evidence": "Issue #1 CRITICAL"},
+        {"text": "SQL injection in audit-log", "passed": true, "evidence": "Issue #2 CRITICAL"},
+        {"text": "Password change skips verification", "passed": true, "evidence": "Issue #3 CRITICAL"},
+        {"text": "5+ findings", "passed": true, "evidence": "17 findings"},
+        {"text": "Severity-ordered", "passed": true, "evidence": "CRITICAL>HIGH>MEDIUM>LOW"},
+        {"text": "F{N} format", "passed": false, "evidence": "Numbered headings"},
+        {"text": "Subagent used", "passed": false, "evidence": "N/A"},
+        {"text": "Validity labels", "passed": false, "evidence": "None"},
+        {"text": "Summary table", "passed": false, "evidence": "None"},
+        {"text": "Resolution options", "passed": false, "evidence": "Summary list instead"}
+      ]
+    }
+  ],
+  "run_summary": {
+    "with_skill": {
+      "pass_rate": {"mean": 0.90, "stddev": 0.005, "min": 0.89, "max": 0.90},
+      "time_seconds": {"mean": 77.2, "stddev": 9.0, "min": 69.1, "max": 89.6},
+      "tokens": {"mean": 19880, "stddev": 752, "min": 19400, "max": 21078}
+    },
+    "without_skill": {
+      "pass_rate": {"mean": 0.44, "stddev": 0.05, "min": 0.40, "max": 0.50},
+      "time_seconds": {"mean": 52.4, "stddev": 7.6, "min": 42.5, "max": 61.0},
+      "tokens": {"mean": 10243, "stddev": 1542, "min": 8933, "max": 12278}
+    },
+    "delta": {
+      "pass_rate": "+0.46",
+      "time_seconds": "+24.8",
+      "tokens": "+9637"
+    }
+  },
+  "notes": [
+    "Iteration 2 shows dramatic improvement in discrimination: with_skill 90% vs without_skill 44% (delta +46pp, up from +15pp in iteration 1).",
+    "The subagent assertion still fails 100% for with_skill due to test harness limitation (subagents cannot spawn sub-subagents). This is not a skill defect.",
+    "Excluding the subagent assertion, with_skill achieves 100% pass rate across all 4 evals.",
+    "New discriminating assertions (validity labels, summary table, resolution options) pass 100% with skill and 0% without skill — perfect discrimination.",
+    "The F{N} format assertion continues to be a strong discriminator: 100% with skill, 0% without.",
+    "Content quality (finding the actual bugs) is equivalent between configurations — both catch all key vulnerabilities.",
+    "Time overhead reduced from 2x to 1.5x vs iteration 1, likely due to clearer skill instructions reducing wasted effort.",
+    "Eval 4 (multi-file auth) worked well — both configurations caught the subtle SQL injection, hardcoded secret, and password bypass."
+  ]
+}

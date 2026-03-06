@@ -1,0 +1,15 @@
+{
+  "expectations": [
+    {"text": "XSS via dangerouslySetInnerHTML as Critical/High", "passed": true, "evidence": "Issue #1 CRITICAL"},
+    {"text": "At least 3 distinct findings", "passed": true, "evidence": "8 findings total"},
+    {"text": "Severity-ordered findings", "passed": true, "evidence": "CRITICAL > HIGH > MEDIUM > LOW"},
+    {"text": "File location references", "passed": true, "evidence": "File: and line references present"},
+    {"text": "F{N} [{Severity}] format", "passed": false, "evidence": "Uses ### numbered headings"},
+    {"text": "Stale closure / missing useEffect dep", "passed": true, "evidence": "Issue #2 identifies stale closure"},
+    {"text": "Subagent used for information asymmetry", "passed": false, "evidence": "N/A for baseline"},
+    {"text": "Validity labels on findings", "passed": false, "evidence": "No Real/Noise/Undecided labels"},
+    {"text": "Summary table with severity/validity", "passed": false, "evidence": "Summary table exists but no validity columns"},
+    {"text": "Resolution options [W], [F], [S]", "passed": false, "evidence": "No structured resolution options"}
+  ],
+  "summary": {"passed": 4, "failed": 6, "total": 10, "pass_rate": 0.40}
+}

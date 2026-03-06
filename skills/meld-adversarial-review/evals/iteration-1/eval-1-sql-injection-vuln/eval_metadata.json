@@ -1,0 +1,14 @@
+{
+  "eval_id": 1,
+  "eval_name": "sql-injection-vuln",
+  "prompt": "I've finished implementing CRUD endpoints for user management. The baseline commit is abc1234. Please do an adversarial review of my changes.",
+  "assertions": [
+    "The review identifies SQL injection as a Critical finding",
+    "The review identifies at least 4 distinct findings total",
+    "Findings are ordered by severity (Critical/High before Medium/Low)",
+    "Each finding includes a file location reference",
+    "The review uses the F{N} [{Severity}] format for findings",
+    "The review identifies the missing/empty test stubs as a finding",
+    "The review process uses a subagent (Task tool) for information asymmetry"
+  ]
+}

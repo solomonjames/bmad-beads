@@ -1,0 +1,15 @@
+{
+  "expectations": [
+    {"text": "Hardcoded JWT secret as Critical/High", "passed": true, "evidence": "Issue #1 CRITICAL"},
+    {"text": "SQL injection in audit-log", "passed": true, "evidence": "Issue #2 CRITICAL with detailed explanation"},
+    {"text": "Password change skips verification", "passed": true, "evidence": "Issue #3 CRITICAL"},
+    {"text": "At least 5 distinct findings", "passed": true, "evidence": "17 findings total"},
+    {"text": "Severity-ordered findings", "passed": true, "evidence": "CRITICAL > HIGH > MEDIUM > LOW"},
+    {"text": "F{N} [{Severity}] format", "passed": false, "evidence": "Uses ### numbered headings"},
+    {"text": "Subagent used for information asymmetry", "passed": false, "evidence": "N/A for baseline"},
+    {"text": "Validity labels on findings", "passed": false, "evidence": "No Real/Noise/Undecided classification"},
+    {"text": "Summary table with severity/validity", "passed": false, "evidence": "No summary table"},
+    {"text": "Resolution options [W], [F], [S]", "passed": false, "evidence": "Uses 'Summary' list of priorities instead"}
+  ],
+  "summary": {"passed": 5, "failed": 5, "total": 10, "pass_rate": 0.50}
+}

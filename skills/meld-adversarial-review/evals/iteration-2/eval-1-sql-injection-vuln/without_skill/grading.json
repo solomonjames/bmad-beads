@@ -1,0 +1,15 @@
+{
+  "expectations": [
+    {"text": "SQL injection identified as Critical", "passed": true, "evidence": "Issue #1 CRITICAL / SECURITY"},
+    {"text": "At least 4 distinct findings", "passed": true, "evidence": "9 findings total"},
+    {"text": "Severity-ordered findings", "passed": true, "evidence": "Critical > Major > Minor groupings"},
+    {"text": "File location references", "passed": true, "evidence": "Line numbers referenced throughout"},
+    {"text": "F{N} [{Severity}] format", "passed": false, "evidence": "Uses ### numbered headings, not F{N} format"},
+    {"text": "Empty test stubs identified", "passed": true, "evidence": "Issue #9 mentions TODO tests"},
+    {"text": "Subagent used for information asymmetry", "passed": false, "evidence": "N/A for baseline"},
+    {"text": "Validity labels on findings", "passed": false, "evidence": "No Real/Noise/Undecided classification"},
+    {"text": "Summary table with severity/validity", "passed": false, "evidence": "No summary table with validity breakdown"},
+    {"text": "Resolution options [W], [F], [S]", "passed": false, "evidence": "Uses 'Verdict: Do not merge' instead of structured options"}
+  ],
+  "summary": {"passed": 4, "failed": 6, "total": 10, "pass_rate": 0.40}
+}

@@ -1,0 +1,1325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Eval Review</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600&family=Lora:wght@400;500&display=swap" rel="stylesheet">
+  <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js" integrity="sha384-EnyY0/GSHQGSxSgMwaIPzSESbqoOLSexfnSMN2AP+39Ckmn92stwABZynq1JyzdT" crossorigin="anonymous"></script>
+  <style>
+    :root {
+      --bg: #faf9f5;
+      --surface: #ffffff;
+      --border: #e8e6dc;
+      --text: #141413;
+      --text-muted: #b0aea5;
+      --accent: #d97757;
+      --accent-hover: #c4613f;
+      --green: #788c5d;
+      --green-bg: #eef2e8;
+      --red: #c44;
+      --red-bg: #fceaea;
+      --header-bg: #141413;
+      --header-text: #faf9f5;
+      --radius: 6px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Lora', Georgia, serif;
+      background: var(--bg);
+      color: var(--text);
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ---- Header ---- */
+    .header {
+      background: var(--header-bg);
+      color: var(--header-text);
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-shrink: 0;
+    }
+    .header h1 {
+      font-family: 'Poppins', sans-serif;
+      font-size: 1.25rem;
+      font-weight: 600;
+    }
+    .header .instructions {
+      font-size: 0.8rem;
+      opacity: 0.7;
+      margin-top: 0.25rem;
+    }
+    .header .progress {
+      font-size: 0.875rem;
+      opacity: 0.8;
+      text-align: right;
+    }
+
+    /* ---- Main content ---- */
+    .main {
+      flex: 1;
+      overflow-y: auto;
+      padding: 1.5rem 2rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+
+    /* ---- Sections ---- */
+    .section {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      flex-shrink: 0;
+    }
+    .section-header {
+      font-family: 'Poppins', sans-serif;
+      padding: 0.75rem 1rem;
+      font-size: 0.75rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      border-bottom: 1px solid var(--border);
+      background: var(--bg);
+    }
+    .section-body {
+      padding: 1rem;
+    }
+
+    /* ---- Config badge ---- */
+    .config-badge {
+      display: inline-block;
+      padding: 0.2rem 0.625rem;
+      border-radius: 9999px;
+      font-family: 'Poppins', sans-serif;
+      font-size: 0.6875rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      margin-left: 0.75rem;
+      vertical-align: middle;
+    }
+    .config-badge.config-primary {
+      background: rgba(33, 150, 243, 0.12);
+      color: #1976d2;
+    }
+    .config-badge.config-baseline {
+      background: rgba(255, 193, 7, 0.15);
+      color: #f57f17;
+    }
+
+    /* ---- Prompt ---- */
+    .prompt-text {
+      white-space: pre-wrap;
+      font-size: 0.9375rem;
+      line-height: 1.6;
+    }
+
+    /* ---- Outputs ---- */
+    .output-file {
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+    .output-file + .output-file {
+      margin-top: 1rem;
+    }
+    .output-file-header {
+      padding: 0.5rem 0.75rem;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+      font-family: 'SF Mono', SFMono-Regular, Consolas, 'Liberation Mono', Menlo, monospace;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .output-file-header .dl-btn {
+      font-size: 0.7rem;
+      color: var(--accent);
+      text-decoration: none;
+      cursor: pointer;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-weight: 500;
+      opacity: 0.8;
+    }
+    .output-file-header .dl-btn:hover {
+      opacity: 1;
+      text-decoration: underline;
+    }
+    .output-file-content {
+      padding: 0.75rem;
+      overflow-x: auto;
+    }
+    .output-file-content pre {
+      font-size: 0.8125rem;
+      line-height: 1.5;
+      white-space: pre-wrap;
+      word-break: break-word;
+      font-family: 'SF Mono', SFMono-Regular, Consolas, 'Liberation Mono', Menlo, monospace;
+    }
+    .output-file-content img {
+      max-width: 100%;
+      height: auto;
+      border-radius: 4px;
+    }
+    .output-file-content iframe {
+      width: 100%;
+      height: 600px;
+      border: none;
+    }
+    .output-file-content table {
+      border-collapse: collapse;
+      font-size: 0.8125rem;
+      width: 100%;
+    }
+    .output-file-content table td,
+    .output-file-content table th {
+      border: 1px solid var(--border);
+      padding: 0.375rem 0.5rem;
+      text-align: left;
+    }
+    .output-file-content table th {
+      background: var(--bg);
+      font-weight: 600;
+    }
+    .output-file-content .download-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 1rem;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      color: var(--accent);
+      text-decoration: none;
+      font-size: 0.875rem;
+      cursor: pointer;
+    }
+    .output-file-content .download-link:hover {
+      background: var(--border);
+    }
+    .empty-state {
+      color: var(--text-muted);
+      font-style: italic;
+      padding: 2rem;
+      text-align: center;
+    }
+
+    /* ---- Feedback ---- */
+    .prev-feedback {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 0.625rem 0.75rem;
+      margin-top: 0.75rem;
+      font-size: 0.8125rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+    .prev-feedback-label {
+      font-size: 0.7rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin-bottom: 0.25rem;
+      color: var(--text-muted);
+    }
+    .feedback-textarea {
+      width: 100%;
+      min-height: 100px;
+      padding: 0.75rem;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      font-family: inherit;
+      font-size: 0.9375rem;
+      line-height: 1.5;
+      resize: vertical;
+      color: var(--text);
+    }
+    .feedback-textarea:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    }
+    .feedback-status {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-top: 0.5rem;
+      min-height: 1.1em;
+    }
+
+    /* ---- Grades (collapsible) ---- */
+    .grades-toggle {
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+      user-select: none;
+    }
+    .grades-toggle:hover {
+      color: var(--accent);
+    }
+    .grades-toggle .arrow {
+      margin-right: 0.5rem;
+      transition: transform 0.15s;
+      font-size: 0.75rem;
+    }
+    .grades-toggle .arrow.open {
+      transform: rotate(90deg);
+    }
+    .grades-content {
+      display: none;
+      margin-top: 0.75rem;
+    }
+    .grades-content.open {
+      display: block;
+    }
+    .grades-summary {
+      font-size: 0.875rem;
+      margin-bottom: 0.75rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .grade-badge {
+      display: inline-block;
+      padding: 0.125rem 0.5rem;
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+    .grade-pass { background: var(--green-bg); color: var(--green); }
+    .grade-fail { background: var(--red-bg); color: var(--red); }
+    .assertion-list {
+      list-style: none;
+    }
+    .assertion-item {
+      padding: 0.625rem 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.8125rem;
+    }
+    .assertion-item:last-child { border-bottom: none; }
+    .assertion-status {
+      font-weight: 600;
+      margin-right: 0.5rem;
+    }
+    .assertion-status.pass { color: var(--green); }
+    .assertion-status.fail { color: var(--red); }
+    .assertion-evidence {
+      color: var(--text-muted);
+      font-size: 0.75rem;
+      margin-top: 0.25rem;
+      padding-left: 1.5rem;
+    }
+
+    /* ---- View tabs ---- */
+    .view-tabs {
+      display: flex;
+      gap: 0;
+      padding: 0 2rem;
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+    .view-tab {
+      font-family: 'Poppins', sans-serif;
+      padding: 0.625rem 1.25rem;
+      font-size: 0.8125rem;
+      font-weight: 500;
+      cursor: pointer;
+      border: none;
+      background: none;
+      color: var(--text-muted);
+      border-bottom: 2px solid transparent;
+      transition: all 0.15s;
+    }
+    .view-tab:hover { color: var(--text); }
+    .view-tab.active {
+      color: var(--accent);
+      border-bottom-color: var(--accent);
+    }
+    .view-panel { display: none; }
+    .view-panel.active { display: flex; flex-direction: column; flex: 1; overflow: hidden; }
+
+    /* ---- Benchmark view ---- */
+    .benchmark-view {
+      padding: 1.5rem 2rem;
+      overflow-y: auto;
+      flex: 1;
+    }
+    .benchmark-table {
+      border-collapse: collapse;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      font-size: 0.8125rem;
+      width: 100%;
+      margin-bottom: 1.5rem;
+    }
+    .benchmark-table th, .benchmark-table td {
+      padding: 0.625rem 0.75rem;
+      text-align: left;
+      border: 1px solid var(--border);
+    }
+    .benchmark-table th {
+      font-family: 'Poppins', sans-serif;
+      background: var(--header-bg);
+      color: var(--header-text);
+      font-weight: 500;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    .benchmark-table tr:hover { background: var(--bg); }
+    .benchmark-table tr.benchmark-row-with { background: rgba(33, 150, 243, 0.06); }
+    .benchmark-table tr.benchmark-row-without { background: rgba(255, 193, 7, 0.06); }
+    .benchmark-table tr.benchmark-row-with:hover { background: rgba(33, 150, 243, 0.12); }
+    .benchmark-table tr.benchmark-row-without:hover { background: rgba(255, 193, 7, 0.12); }
+    .benchmark-table tr.benchmark-row-avg { font-weight: 600; border-top: 2px solid var(--border); }
+    .benchmark-table tr.benchmark-row-avg.benchmark-row-with { background: rgba(33, 150, 243, 0.12); }
+    .benchmark-table tr.benchmark-row-avg.benchmark-row-without { background: rgba(255, 193, 7, 0.12); }
+    .benchmark-delta-positive { color: var(--green); font-weight: 600; }
+    .benchmark-delta-negative { color: var(--red); font-weight: 600; }
+    .benchmark-notes {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1rem;
+    }
+    .benchmark-notes h3 {
+      font-family: 'Poppins', sans-serif;
+      font-size: 0.875rem;
+      margin-bottom: 0.75rem;
+    }
+    .benchmark-notes ul {
+      list-style: disc;
+      padding-left: 1.25rem;
+    }
+    .benchmark-notes li {
+      font-size: 0.8125rem;
+      line-height: 1.6;
+      margin-bottom: 0.375rem;
+    }
+    .benchmark-empty {
+      color: var(--text-muted);
+      font-style: italic;
+      text-align: center;
+      padding: 3rem;
+    }
+
+    /* ---- Navigation ---- */
+    .nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 2rem;
+      border-top: 1px solid var(--border);
+      background: var(--surface);
+      flex-shrink: 0;
+    }
+    .nav-btn {
+      font-family: 'Poppins', sans-serif;
+      padding: 0.5rem 1.25rem;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--surface);
+      cursor: pointer;
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: var(--text);
+      transition: all 0.15s;
+    }
+    .nav-btn:hover:not(:disabled) {
+      background: var(--bg);
+      border-color: var(--text-muted);
+    }
+    .nav-btn:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+    .done-btn {
+      font-family: 'Poppins', sans-serif;
+      padding: 0.5rem 1.5rem;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--surface);
+      color: var(--text);
+      cursor: pointer;
+      font-size: 0.875rem;
+      font-weight: 500;
+      transition: all 0.15s;
+    }
+    .done-btn:hover {
+      background: var(--bg);
+      border-color: var(--text-muted);
+    }
+    .done-btn.ready {
+      border: none;
+      background: var(--accent);
+      color: white;
+      font-weight: 600;
+    }
+    .done-btn.ready:hover {
+      background: var(--accent-hover);
+    }
+    /* ---- Done overlay ---- */
+    .done-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 100;
+      justify-content: center;
+      align-items: center;
+    }
+    .done-overlay.visible {
+      display: flex;
+    }
+    .done-card {
+      background: var(--surface);
+      border-radius: 12px;
+      padding: 2rem 3rem;
+      text-align: center;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      max-width: 500px;
+    }
+    .done-card h2 {
+      font-size: 1.5rem;
+      margin-bottom: 0.5rem;
+    }
+    .done-card p {
+      color: var(--text-muted);
+      margin-bottom: 1.5rem;
+      line-height: 1.5;
+    }
+    .done-card .btn-row {
+      display: flex;
+      gap: 0.5rem;
+      justify-content: center;
+    }
+    .done-card button {
+      padding: 0.5rem 1.25rem;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--surface);
+      cursor: pointer;
+      font-size: 0.875rem;
+    }
+    .done-card button:hover {
+      background: var(--bg);
+    }
+    /* ---- Toast ---- */
+    .toast {
+      position: fixed;
+      bottom: 5rem;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--header-bg);
+      color: var(--header-text);
+      padding: 0.625rem 1.25rem;
+      border-radius: var(--radius);
+      font-size: 0.875rem;
+      opacity: 0;
+      transition: opacity 0.3s;
+      pointer-events: none;
+      z-index: 200;
+    }
+    .toast.visible {
+      opacity: 1;
+    }
+  </style>
+</head>
+<body>
+  <div id="app" style="height:100vh; display:flex; flex-direction:column;">
+    <div class="header">
+      <div>
+        <h1>Eval Review: <span id="skill-name"></span></h1>
+        <div class="instructions">Review each output and leave feedback below. Navigate with arrow keys or buttons. When done, copy feedback and paste into Claude Code.</div>
+      </div>
+      <div class="progress" id="progress"></div>
+    </div>
+
+    <!-- View tabs (only shown when benchmark data exists) -->
+    <div class="view-tabs" id="view-tabs" style="display:none;">
+      <button class="view-tab active" onclick="switchView('outputs')">Outputs</button>
+      <button class="view-tab" onclick="switchView('benchmark')">Benchmark</button>
+    </div>
+
+    <!-- Outputs panel (qualitative review) -->
+    <div class="view-panel active" id="panel-outputs">
+    <div class="main">
+      <!-- Prompt -->
+      <div class="section">
+        <div class="section-header">Prompt <span class="config-badge" id="config-badge" style="display:none;"></span></div>
+        <div class="section-body">
+          <div class="prompt-text" id="prompt-text"></div>
+        </div>
+      </div>
+
+      <!-- Outputs -->
+      <div class="section">
+        <div class="section-header">Output</div>
+        <div class="section-body" id="outputs-body">
+          <div class="empty-state">No output files found</div>
+        </div>
+      </div>
+
+      <!-- Previous Output (collapsible) -->
+      <div class="section" id="prev-outputs-section" style="display:none;">
+        <div class="section-header">
+          <div class="grades-toggle" onclick="togglePrevOutputs()">
+            <span class="arrow" id="prev-outputs-arrow">&#9654;</span>
+            Previous Output
+          </div>
+        </div>
+        <div class="grades-content" id="prev-outputs-content"></div>
+      </div>
+
+      <!-- Grades (collapsible) -->
+      <div class="section" id="grades-section" style="display:none;">
+        <div class="section-header">
+          <div class="grades-toggle" onclick="toggleGrades()">
+            <span class="arrow" id="grades-arrow">&#9654;</span>
+            Formal Grades
+          </div>
+        </div>
+        <div class="grades-content" id="grades-content"></div>
+      </div>
+
+      <!-- Feedback -->
+      <div class="section">
+        <div class="section-header">Your Feedback</div>
+        <div class="section-body">
+          <textarea
+            class="feedback-textarea"
+            id="feedback"
+            placeholder="What do you think of this output? Any issues, suggestions, or things that look great?"
+          ></textarea>
+          <div class="feedback-status" id="feedback-status"></div>
+          <div class="prev-feedback" id="prev-feedback" style="display:none;">
+            <div class="prev-feedback-label">Previous feedback</div>
+            <div id="prev-feedback-text"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="nav" id="outputs-nav">
+      <button class="nav-btn" id="prev-btn" onclick="navigate(-1)">&#8592; Previous</button>
+      <button class="done-btn" id="done-btn" onclick="showDoneDialog()">Submit All Reviews</button>
+      <button class="nav-btn" id="next-btn" onclick="navigate(1)">Next &#8594;</button>
+    </div>
+    </div><!-- end panel-outputs -->
+
+    <!-- Benchmark panel (quantitative stats) -->
+    <div class="view-panel" id="panel-benchmark">
+      <div class="benchmark-view" id="benchmark-content">
+        <div class="benchmark-empty">No benchmark data available. Run a benchmark to see quantitative results here.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Done overlay -->
+  <div class="done-overlay" id="done-overlay">
+    <div class="done-card">
+      <h2>Review Complete</h2>
+      <p>Your feedback has been saved. Go back to your Claude Code session and tell Claude you're done reviewing.</p>
+      <div class="btn-row">
+        <button onclick="closeDoneDialog()">OK</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast"></div>
+
+  <script>
+    // ---- Embedded data (injected by generate_review.py) ----
+    const EMBEDDED_DATA = {"skill_name": "meld-adversarial-review", "runs": [{"id": "eval-1-sql-injection-vuln-with_skill", "prompt": "I've finished implementing CRUD endpoints for user management. The baseline commit is abc1234. Please do an adversarial review of my changes.", "eval_id": 1, "outputs": [{"name": "review_output.md", "type": "text", "content": "# Adversarial Review: User Management CRUD Endpoints\n\n**Baseline commit:** abc1234\n**Diff source:** eval-files/diff-1-sql-injection.diff\n**Review method:** Information-asymmetric inline review (reviewer saw ONLY the diff, no spec or conversation context)\n\n---\n\n## Findings\n\n### F1 [Critical/Real] -- SQL Injection via string interpolation in all queries\n\nAll four SQL queries use template literal string interpolation to embed user-supplied values directly into SQL strings. This is textbook SQL injection affecting the SELECT (duplicate check), INSERT (user creation), DELETE, and search SELECT queries. An attacker can inject arbitrary SQL via email, name, id, role, or search query parameters.\n\n**Fix:** Replace all string-interpolated queries with parameterized queries using `$1, $2, ...` placeholders and passing values as a separate array.\n\n**Location:** src/api/users.ts lines ~21-22, ~30-31, ~39, ~50\n\n---\n\n### F2 [Critical/Real] -- Mass assignment / privilege escalation via role parameter\n\nThe POST /users endpoint destructures `role` from `req.body` and inserts it directly into the database with no validation. Any caller can self-assign any role (e.g., \"admin\") by including it in the request body.\n\n**Fix:** Either remove `role` from user-controllable input (assign a default), or validate against an allowlist of permitted roles with authorization checks.\n\n**Location:** src/api/users.ts line ~18, ~31\n\n---\n\n### F3 [High/Real] -- No input validation on any endpoint\n\nNo endpoint validates that required fields are present, non-empty, or well-formed. Missing `name`, `email`, or `password` on POST will produce undefined values in the query. Missing `q` on search produces the literal string \"undefined\" in SQL. The DELETE endpoint does not validate that `id` is numeric.\n\n**Fix:** Add input validation (check required fields exist, validate email format, validate id is numeric, validate q is a non-empty string).\n\n**Location:** src/api/users.ts lines ~18, ~38, ~49\n\n---\n\n### F4 [High/Real] -- No error handling / missing try-catch\n\nAll async route handlers lack try-catch blocks. Database errors will propagate to Express's default error handler, likely returning 500 with a stack trace that leaks internal information.\n\n**Fix:** Wrap each handler body in try-catch, return structured error responses, and log errors appropriately.\n\n**Location:** src/api/users.ts all route handlers\n\n---\n\n### F5 [High/Real] -- Unhandled promise rejection from sendWelcomeEmail\n\n`sendWelcomeEmail(email, name)` is called without `await` and without `.catch()`. If it returns a rejecting promise, this causes an unhandled promise rejection that can crash the Node.js process.\n\n**Fix:** Add `.catch()` handler: `sendWelcomeEmail(email, name).catch(err => logger.error(err))`.\n\n**Location:** src/api/users.ts line ~35\n\n---\n\n### F6 [High/Undecided] -- DELETE endpoint missing authorization\n\nThe DELETE /users/:id endpoint has no visible authentication or authorization check. Any unauthenticated caller could delete any user by ID. However, auth middleware might be applied at the router level in code not visible in this diff.\n\n**Location:** src/api/users.ts lines ~37-45\n\n---\n\n### F7 [High/Real] -- Search endpoint route ordering bug\n\n`/users/search` is defined AFTER `/users/:id` in the router. Express matches routes in registration order, so requests to `/users/search` will be captured by the `:id` route (with `id = \"search\"`). The search endpoint will never be reached.\n\n**Fix:** Move the `/users/search` route definition BEFORE the `/users/:id` route.\n\n**Location:** src/api/users.ts line ~48 vs line ~14\n\n---\n\n### F8 [Medium/Real] -- Tests lack coverage for critical paths\n\nDELETE tests contain only a TODO comment. No tests exist for the search endpoint. No tests cover error cases, missing fields, or security scenarios. Only happy-path creation and duplicate-email detection are tested.\n\n**Location:** src/api/__tests__/users.test.ts lines ~25-27\n\n---\n\n### F9 [Medium/Undecided] -- No rate limiting on user creation\n\nPOST /users has no rate limiting visible in the diff. However, rate limiting may exist at the middleware or infrastructure level outside this diff's scope.\n\n**Location:** src/api/users.ts POST route\n\n---\n\n### F10 [Low/Noise] -- Weak test password\n\nTest fixtures use \"pass123\" as the password. This is normal for test data and not a production concern. The observation about missing password-strength validation is not evidenced by the diff.\n\n**Location:** src/api/__tests__/users.test.ts\n\n---\n\n## Summary\n\n| Severity | Count | Real | Undecided | Noise |\n|----------|-------|------|-----------|-------|\n| Critical | 2 | 2 | 0 | 0 |\n| High | 5 | 4 | 1 | 0 |\n| Medium | 2 | 1 | 1 | 0 |\n| Low | 1 | 0 | 0 | 1 |\n| **Total** | **10** | **7** | **2** | **1** |\n\nThe diff contains **2 critical security vulnerabilities** (SQL injection and privilege escalation) that must be fixed before merge. There are also 4 confirmed high-severity issues including a route-ordering bug that makes the search endpoint unreachable.\n\n---\n\n## Resolution Options\n\n- **[W] Walk through** -- Iterate each finding, decide Fix/Skip/Discuss for each\n- **[F] Fix automatically** -- Apply fixes for all \"Real\" findings, skip Noise/Undecided\n- **[S] Skip** -- Acknowledge findings and proceed without fixes\n"}, {"name": "reviewer_raw_findings.md", "type": "text", "content": "# Adversarial Reviewer Raw Findings\n\nReviewer operated with NO context about the feature, spec, or conversation history. Only the diff was provided.\n\n---\n\nF1 [Critical] -- SQL Injection via string interpolation in all queries\nAll four SQL queries use template literal string interpolation (`'${email}'`, `'${name}'`, `${id}`, `'%${q}%'`) to embed user-supplied values directly into SQL strings. This is textbook SQL injection. An attacker can inject arbitrary SQL via the email, name, id, role, or search query parameters. Parameterized queries ($1, $2, etc.) must be used instead.\nLocation: src/api/users.ts lines ~21-22 (SELECT), ~30-31 (INSERT), ~39 (DELETE), ~50 (search SELECT)\n\nF2 [Critical] -- Mass assignment / privilege escalation via role parameter\nThe POST /users endpoint destructures `role` from `req.body` and inserts it directly into the database. Any user can set their own role (e.g., \"admin\") by including it in the request body. There is no validation or authorization check on the role value.\nLocation: src/api/users.ts line ~18, ~31\n\nF3 [High] -- No input validation on any endpoint\nNone of the endpoints validate that required fields are present or well-formed. POST /users does not check that name, email, or password exist before using them. The search endpoint does not check that `q` exists (could be undefined, producing the string \"undefined\" in the SQL). The DELETE endpoint does not validate that id is numeric.\nLocation: src/api/users.ts lines ~18, ~38, ~49\n\nF4 [High] -- No error handling / missing try-catch\nAll async route handlers lack try-catch blocks. If any `db.query` call throws, the error propagates to Express's default error handler, likely returning a 500 with a stack trace. This leaks internal information and provides no structured error response.\nLocation: src/api/users.ts all route handlers\n\nF5 [High] -- Unhandled promise rejection from sendWelcomeEmail\n`sendWelcomeEmail(email, name)` is called without await and without `.catch()`. If this function returns a promise that rejects, it will cause an unhandled promise rejection, potentially crashing the Node.js process.\nLocation: src/api/users.ts line ~35\n\nF6 [High] -- DELETE endpoint missing authorization\nThe DELETE /users/:id endpoint has no authentication or authorization check. Any unauthenticated caller can delete any user by ID.\nLocation: src/api/users.ts lines ~37-45\n\nF7 [High] -- Search endpoint route ordering issue\n`/users/search` is defined AFTER `/users/:id`. Express will match `/users/search` against the `/users/:id` route first (treating \"search\" as an id parameter). The search route will never be reached.\nLocation: src/api/users.ts line ~48 (defined after :id route at line ~14)\n\nF8 [Medium] -- Tests lack coverage for critical paths\nDELETE tests are empty (just a TODO comment). There are no tests for the search endpoint. There are no tests for error cases (missing fields, SQL injection attempts, invalid input). The two existing tests only cover the happy path and duplicate email case.\nLocation: src/api/__tests__/users.test.ts lines ~25-27\n\nF9 [Medium] -- No rate limiting on user creation\nThe POST /users endpoint has no rate limiting. An attacker could create unlimited accounts.\nLocation: src/api/users.ts POST route\n\nF10 [Low] -- Weak test password\nTest uses \"pass123\" as the password value, which is fine for testing but there is no indication that password strength validation exists in the actual code path either.\nLocation: src/api/__tests__/users.test.ts line ~10\n"}, {"name": "severity_validity_assessment.md", "type": "text", "content": "# Severity and Validity Assessment\n\nEach finding from the reviewer is assessed for severity and validity per the meld-adversarial-review skill criteria.\n\n| # | Severity | Validity | Rationale |\n|---|----------|----------|-----------|\n| F1 | Critical | Real | SQL injection is clearly present in 4 separate queries. String interpolation of user input into SQL is unambiguous in the diff. This is the highest-priority fix. |\n| F2 | Critical | Real | The `role` field is taken directly from the request body with no validation or authorization. This is a privilege escalation vector -- any caller can self-assign admin. |\n| F3 | High | Real | No validation exists for any user-supplied input across all endpoints. The diff confirms destructuring without any guards. |\n| F4 | High | Real | No try-catch blocks are visible in the diff. While Express error middleware might exist elsewhere, the handlers themselves are unprotected and could leak stack traces. |\n| F5 | High | Real | `sendWelcomeEmail` is fire-and-forget with no `.catch()`. If it returns a rejecting promise, this is an unhandled rejection. |\n| F6 | High | Undecided | The diff does not show the full router setup. Auth middleware might be applied at the router level (e.g., `router.use(authMiddleware)`) in code not visible in this diff. However, no auth is visible in the changed lines. |\n| F7 | High | Real | Express matches routes in registration order. `/users/search` is registered after `/users/:id` in the diff, so \"search\" will be captured as an `:id` parameter. This is a genuine route-ordering bug. |\n| F8 | Medium | Real | The test file confirms DELETE tests are TODO-only and search endpoint has no tests. Test coverage is objectively incomplete. |\n| F9 | Medium | Undecided | Rate limiting is typically applied at middleware/infrastructure level, not per-route. The reviewer lacks context about whether rate limiting exists upstream. |\n| F10 | Low | Noise | Test password strength is irrelevant in test fixtures. The observation about missing password validation in production code is tangentially valid but not evidenced by the diff. |\n"}], "grading": {"expectations": [{"text": "The review identifies SQL injection as a Critical finding", "passed": true, "evidence": "F1 [Critical/Real] -- SQL Injection via string interpolation in all queries"}, {"text": "The review identifies at least 4 distinct findings total", "passed": true, "evidence": "10 findings total (F1-F10)"}, {"text": "Findings are ordered by severity (Critical/High before Medium/Low)", "passed": true, "evidence": "F1-F2 Critical, F3-F7 High, F8-F9 Medium, F10 Low"}, {"text": "Each finding includes a file location reference", "passed": true, "evidence": "Every finding has a Location: line with file:line references"}, {"text": "The review uses the F{N} [{Severity}] format for findings", "passed": true, "evidence": "All findings use F1 [Critical/Real], F2 [Critical/Real], etc."}, {"text": "The review identifies the missing/empty test stubs as a finding", "passed": true, "evidence": "F8 [Medium/Real] -- Tests lack coverage for critical paths. Mentions DELETE tests contain only a TODO comment."}, {"text": "The review process uses a subagent (Task tool) for information asymmetry", "passed": false, "evidence": "Agent stated 'the Agent tool was not available' and performed inline review instead. The skill's fallback was used rather than true information asymmetry."}], "summary": {"passed": 6, "failed": 1, "total": 7, "pass_rate": 0.86}, "timing": {"total_duration_seconds": 114.5}}}, {"id": "eval-1-sql-injection-vuln-without_skill", "prompt": "I've finished implementing CRUD endpoints for user management. The baseline commit is abc1234. Please do an adversarial review of my changes.", "eval_id": 1, "outputs": [{"name": "review_output.md", "type": "text", "content": "# Code Review: User Management CRUD Endpoints\n\n**Baseline commit:** abc1234\n**Files changed:** `src/api/users.ts`, `src/api/__tests__/users.test.ts` (new)\n\n---\n\n## Critical Issues\n\n### 1. SQL Injection Vulnerabilities (Critical / Security)\n\nEvery database query in this diff constructs SQL by interpolating user-supplied values directly into the query string. This is a textbook SQL injection vulnerability and must be fixed before merge.\n\n**Affected locations:**\n\n- **Line 22** -- `SELECT id FROM users WHERE email = '${email}'`\n- **Line 32** -- `INSERT INTO users ... VALUES ('${name}', '${email}', '${hashedPassword}', '${role}') ...`\n- **Line 45** -- `DELETE FROM users WHERE id = ${id}`\n- **Line 56** -- `SELECT ... WHERE name LIKE '%${q}%'`\n\nAn attacker can supply a crafted `email`, `name`, `role`, `id`, or `q` value to execute arbitrary SQL -- read the entire database, delete tables, or escalate privileges.\n\n**Fix:** Use parameterized queries throughout:\n\n```ts\n// Instead of:\ndb.query(`SELECT id FROM users WHERE email = '${email}'`);\n\n// Use:\ndb.query('SELECT id FROM users WHERE email = $1', [email]);\n```\n\nApply the same pattern to all four queries.\n\n### 2. No Input Validation (High)\n\nNone of the request body or query parameters are validated before use. The `POST /users` endpoint destructures `name`, `email`, `password`, and `role` from `req.body` with no checks. If any field is `undefined`, the query will insert the literal string `'undefined'` into the database.\n\n- Validate that required fields are present and non-empty.\n- Validate `email` format.\n- Enforce password strength requirements (minimum length at minimum).\n- Validate that `role` is from an allowed set of values to prevent privilege escalation (e.g., a user submitting `role: 'admin'`).\n\n### 3. Mass Assignment / Privilege Escalation via `role` (High)\n\nThe `role` field is accepted directly from the request body with no authorization check or allowlist. Any unauthenticated caller can create an admin account by sending `{ \"role\": \"admin\" }`. Either remove `role` from the user-supplied input (default it server-side) or require an authorized admin caller.\n\n---\n\n## Significant Issues\n\n### 4. No Authentication or Authorization (High)\n\nAll endpoints -- create, delete, search -- appear to be completely unprotected. There is no middleware checking for authentication tokens or verifying the caller has permission to perform these operations. The `DELETE /users/:id` endpoint in particular allows any caller to delete any user.\n\n### 5. No Error Handling (Medium)\n\nNone of the route handlers have try/catch blocks. If `db.query` throws (connection error, constraint violation, malformed input), the error will propagate as an unhandled rejection, likely returning a 500 with a stack trace that leaks internal details to the caller.\n\nWrap each handler body in try/catch and return appropriate error responses.\n\n### 6. Route Ordering: `/users/search` Shadowed by `/users/:id` (Medium)\n\nThe `GET /users/search` route is defined after `GET /users/:id` (line 12 in the existing code). Express evaluates routes in definition order, so a request to `GET /users/search` will match the `:id` param route first, with `id` set to `\"search\"`. The search endpoint will never be reached.\n\n**Fix:** Move the `/users/search` route definition above `/users/:id`, or use a different URL pattern (e.g., `/search/users`).\n\n### 7. Unhandled Promise from `sendWelcomeEmail` (Medium)\n\n`sendWelcomeEmail(email, name)` is called as a fire-and-forget on line 39. If this function returns a promise that rejects, it becomes an unhandled promise rejection, which in Node.js 15+ terminates the process by default.\n\nAt minimum, add `.catch()` to log and swallow the error:\n\n```ts\nsendWelcomeEmail(email, name).catch(err => logger.error('Welcome email failed', err));\n```\n\n---\n\n## Minor Issues\n\n### 8. Password Returned in Response (Low)\n\nThe `INSERT ... RETURNING id, name, email, role` on line 32 does not return the password column, which is correct. However, this is only safe as long as that `RETURNING` clause is maintained. Consider using a shared projection or DTO to ensure the password hash is never accidentally leaked.\n\n### 9. DELETE Returns 204 but Search Has No Pagination (Low)\n\nThe search endpoint returns all matching rows with no `LIMIT`. On a large dataset, `LIKE '%..%'` is a full table scan and could return an unbounded number of results. Add pagination parameters (`limit`, `offset`).\n\n### 10. Test Coverage Gaps (Low)\n\n- The `DELETE /users/:id` test suite is empty (`// TODO: Add tests`).\n- There are no tests for `GET /users/search`.\n- There are no tests for invalid input, missing fields, or error cases.\n- There are no tests exercising SQL injection payloads to verify the queries are safe (they are not).\n\n---\n\n## Summary\n\nThis diff must not be merged in its current state. The SQL injection vulnerabilities alone are a blocking concern -- they are present in every new query and would allow full database compromise. The lack of input validation and authentication are secondary but also critical for a production endpoint.\n\n**Recommended priority for fixes:**\n1. Convert all queries to parameterized queries (SQL injection).\n2. Add input validation for all endpoints.\n3. Remove user-controllable `role` assignment or gate it behind authorization.\n4. Add authentication/authorization middleware.\n5. Add try/catch error handling to all handlers.\n6. Fix the route ordering for `/users/search`.\n7. Handle the `sendWelcomeEmail` promise rejection.\n8. Complete the test suite.\n"}], "grading": {"expectations": [{"text": "The review identifies SQL injection as a Critical finding", "passed": true, "evidence": "SQL injection in all 4 queries identified as Critical severity"}, {"text": "The review identifies at least 4 distinct findings total", "passed": true, "evidence": "10 findings total across Critical, Significant, and Minor categories"}, {"text": "Findings are ordered by severity (Critical/High before Medium/Low)", "passed": true, "evidence": "Grouped under Critical Issues, Significant Issues, Minor Issues headings"}, {"text": "Each finding includes a file location reference", "passed": true, "evidence": "Most findings reference specific line numbers (e.g., Line 22, Line 32)"}, {"text": "The review uses the F{N} [{Severity}] format for findings", "passed": false, "evidence": "Uses numbered headings (### 1. SQL Injection...) with severity categories, not F{N} format"}, {"text": "The review identifies the missing/empty test stubs as a finding", "passed": true, "evidence": "Issue #10 'Test Coverage Gaps' mentions DELETE suite is empty with TODO comment"}, {"text": "The review process uses a subagent (Task tool) for information asymmetry", "passed": false, "evidence": "No subagent expected for baseline (without_skill) run"}], "summary": {"passed": 5, "failed": 2, "total": 7, "pass_rate": 0.71}, "timing": {"total_duration_seconds": 56.2}}}, {"id": "eval-2-react-xss-with_skill", "prompt": "Implementation of the Dashboard component is done. Baseline commit is def5678. Run an adversarial review on the diff.", "eval_id": 2, "outputs": [{"name": "review_output.md", "type": "text", "content": "# Adversarial Review -- Dashboard Component\n\n**Baseline commit:** def5678\n**Diff source:** eval-files/diff-2-react-component.diff\n**Review method:** Inline cold review (information asymmetry -- reviewer saw ONLY the diff, no spec or conversation context)\n\n---\n\n## Reviewer Findings (Raw)\n\nF1 [Critical] -- XSS vulnerability via dangerouslySetInnerHTML\nThe component renders `event.description` using `dangerouslySetInnerHTML={{ __html: event.description }}` without any sanitization. If `event.description` contains user-supplied or API-sourced HTML, this is a direct cross-site scripting (XSS) vector. An attacker who can control event description content can execute arbitrary JavaScript in users' browsers.\nLocation: src/components/Dashboard.tsx:80\n\nF2 [High] -- useEffect dependency array missing refreshInterval and userId\nThe `useEffect` depends on `selectedPeriod` but omits `refreshInterval` and `userId` (used inside `loadMetrics`). If `refreshInterval` or `userId` changes, the interval will not be reconfigured. Additionally, `loadMetrics` is defined outside the effect but closes over `userId` and `selectedPeriod`, creating a stale closure risk.\nLocation: src/components/Dashboard.tsx:23-27\n\nF3 [High] -- No null/undefined guard on metrics properties before render\nAfter loading, the code accesses `metrics.revenue`, `metrics.activeUsers`, `metrics.recentEvents.map(...)`, etc. without null-checking. State is `useState<any>(null)` and `loading` is set to false in the catch block, meaning `metrics` could still be null when rendering if error state is not set.\nLocation: src/components/Dashboard.tsx:56-83\n\nF4 [High] -- Error state is never cleared on retry\nWhen `loadMetrics` is called again (via interval or period change), `setError(null)` is never called at the start. Once an error occurs, the error view persists even if subsequent fetches succeed.\nLocation: src/components/Dashboard.tsx:29-38, 41\n\nF5 [High] -- Tests do not cover error state, period selection, or XSS\nOnly two tests exist: loading state and rendered metrics. No tests for error handling, period selection, refresh interval, or the dangerouslySetInnerHTML usage.\nLocation: src/components/__tests__/Dashboard.test.tsx\n\nF6 [Medium] -- Using `any` type for metrics state\n`useState<any>(null)` discards all type safety. A proper interface should be defined matching the metrics shape.\nLocation: src/components/Dashboard.tsx:18\n\nF7 [Medium] -- No cleanup of in-flight fetch on unmount or re-render\nWhen the effect cleans up, only the interval is cleared. An in-flight `fetchMetrics` call will still complete and call state setters on an unmounted component.\nLocation: src/components/Dashboard.tsx:23-27, 29-38\n\nF8 [Low] -- Revenue displayed without number formatting\n`$${metrics.revenue}` renders as `$50000` instead of `$50,000`. Financial data should use locale-aware formatting.\nLocation: src/components/Dashboard.tsx:56\n\n---\n\n## Severity and Validity Assessment\n\n| # | Severity | Validity | Rationale |\n|---|----------|----------|-----------|\n| F1 | Critical | **Real** | `dangerouslySetInnerHTML` with unsanitized API data is a textbook XSS vulnerability. This must be fixed before shipping. |\n| F2 | High | **Real** | Missing deps in the useEffect array is a genuine React bug. The `refreshInterval` and `userId` props changing will not trigger effect re-runs, and the stale closure over `loadMetrics` is a real correctness issue. |\n| F3 | High | **Real** | If the fetch errors without setting error state (or in a race), `metrics` remains null and the render will throw. The code path from error -> loading=false -> error=null (not set) -> metrics=null -> crash is possible. |\n| F4 | High | **Real** | Error state is never reset. Once the component enters the error view, it stays there permanently even if the interval fetch later succeeds, because error state is checked first in the render. |\n| F5 | High | **Real** | Two tests for a component with this many behaviors (error handling, polling, period switching, XSS-prone rendering) is clearly insufficient. |\n| F6 | Medium | **Real** | Using `any` in TypeScript is a genuine code quality issue. The shape is known from usage and from the test mock. |\n| F7 | Medium | **Real** | Setting state on unmounted components is a known React anti-pattern. Should use an AbortController or a mounted flag. |\n| F8 | Low | **Real** | Minor UX issue. Not a bug but a polish item for financial display. |\n\n**Summary:** 8 findings total. 0 noise -- all findings are genuine issues. 1 Critical (XSS), 4 High, 2 Medium, 1 Low.\n\n---\n\n## Final Findings List (Severity Order)\n\n```\nF1 [Critical/Real] -- XSS vulnerability: dangerouslySetInnerHTML renders unsanitized event.description\nF2 [High/Real]     -- useEffect missing refreshInterval and userId in dependency array; stale closure risk\nF3 [High/Real]     -- No null guard on metrics object; potential crash when metrics is null after error\nF4 [High/Real]     -- Error state never cleared on retry; component stuck in error view after transient failure\nF5 [High/Real]     -- Insufficient test coverage: no tests for error, period change, interval, or XSS vector\nF6 [Medium/Real]   -- useState<any> discards TypeScript safety; metrics shape should be a typed interface\nF7 [Medium/Real]   -- No AbortController or cleanup for in-flight fetch on unmount/re-render\nF8 [Low/Real]      -- Revenue lacks locale-aware number formatting ($50000 vs $50,000)\n```\n\n---\n\n## Resolution Options\n\n- **[W] Walk through** -- Iterate each finding; decide Fix/Skip/Discuss for each\n- **[F] Fix automatically** -- Apply fixes for all \"Real\" findings\n- **[S] Skip** -- Acknowledge findings and proceed without fixes\n"}], "grading": {"expectations": [{"text": "The review identifies XSS via dangerouslySetInnerHTML as Critical or High", "passed": true, "evidence": "F1 [Critical/Real] -- XSS vulnerability: dangerouslySetInnerHTML renders unsanitized event.description"}, {"text": "The review identifies at least 3 distinct findings total", "passed": true, "evidence": "8 findings total (F1-F8)"}, {"text": "Findings are ordered by severity (Critical/High before Medium/Low)", "passed": true, "evidence": "F1 Critical, F2-F5 High, F6-F7 Medium, F8 Low"}, {"text": "Each finding includes a file location reference", "passed": true, "evidence": "All findings include Location: lines with file:line references"}, {"text": "The review uses the F{N} [{Severity}] format for findings", "passed": true, "evidence": "All findings use F1 [Critical/Real], F2 [High/Real], etc."}, {"text": "The review identifies the stale closure or missing dependency in useEffect", "passed": true, "evidence": "F2 [High/Real] -- useEffect missing refreshInterval and userId in dependency array; stale closure risk"}, {"text": "The review process uses a subagent (Task tool) for information asymmetry", "passed": false, "evidence": "Agent stated 'subagent tools are unavailable' and used inline cold review fallback"}], "summary": {"passed": 6, "failed": 1, "total": 7, "pass_rate": 0.86}, "timing": {"total_duration_seconds": 92.5}}}, {"id": "eval-2-react-xss-without_skill", "prompt": "Implementation of the Dashboard component is done. Baseline commit is def5678. Run an adversarial review on the diff.", "eval_id": 2, "outputs": [{"name": "review_output.md", "type": "text", "content": "# Adversarial Code Review: Dashboard Component\n\n**Baseline commit:** def5678\n**Files reviewed:** `src/components/Dashboard.tsx`, `src/components/__tests__/Dashboard.test.tsx`\n\n---\n\n## CRITICAL\n\n### 1. XSS Vulnerability via `dangerouslySetInnerHTML`\n\n**File:** `src/components/Dashboard.tsx`, line 80\n```tsx\n<span dangerouslySetInnerHTML={{ __html: event.description }} />\n```\n\nThis renders `event.description` as raw HTML directly into the DOM. If any event description contains user-supplied or third-party content, an attacker can inject arbitrary scripts (e.g., `<img src=x onerror=\"steal(document.cookie)\">`). This is a textbook cross-site scripting (XSS) vulnerability.\n\n**Recommendation:** Remove `dangerouslySetInnerHTML` entirely and render the description as text content. If rich formatting is genuinely required, sanitize with a library like DOMPurify before rendering:\n```tsx\n<span>{event.description}</span>\n```\n\n---\n\n## HIGH\n\n### 2. Missing `loadMetrics` and `refreshInterval` in useEffect dependency array\n\n**File:** `src/components/Dashboard.tsx`, line 27\n```tsx\nuseEffect(() => {\n    loadMetrics();\n    const interval = setInterval(loadMetrics, refreshInterval);\n    return () => clearInterval(interval);\n}, [selectedPeriod]);\n```\n\n- `loadMetrics` is defined inside the component and closes over `userId` and `selectedPeriod`, but it is not listed as a dependency. This will trigger an ESLint `react-hooks/exhaustive-deps` warning and can cause stale closure bugs -- if `userId` changes, the effect will continue fetching with the old value.\n- `refreshInterval` is also missing. If the prop changes, the interval keeps the old cadence.\n\n**Recommendation:** Either add the missing dependencies, or wrap `loadMetrics` in `useCallback` with its own dependencies and include it plus `refreshInterval` in the effect's dependency array.\n\n### 3. No null-safety on `metrics` access\n\n**File:** `src/components/Dashboard.tsx`, lines 56-83\n\nAfter loading, `metrics` is accessed directly (`metrics.revenue`, `metrics.recentEvents.map(...)`, etc.). If `fetchMetrics` returns a response missing any of these properties, the component will throw at runtime.\n\nAdditionally, `metrics` is typed as `any`, providing zero compile-time safety.\n\n**Recommendation:** Define a proper `Metrics` interface and validate or default each property before rendering.\n\n---\n\n## MEDIUM\n\n### 4. Error state is never cleared\n\n**File:** `src/components/Dashboard.tsx`, lines 29-37\n\nWhen `loadMetrics` succeeds, `error` is never reset to `null`. If a transient failure occurs and the next auto-refresh succeeds, the user will remain stuck on the error screen because the early return on line 41 (`if (error) return ...`) fires first.\n\n**Recommendation:** Add `setError(null)` at the start of the `try` block or before the `fetchMetrics` call.\n\n### 5. Loading state not reset on period change\n\nWhen `selectedPeriod` changes, the effect re-runs but `loading` is not set back to `true`. The user sees stale data from the previous period until the new fetch completes. There is no visual indication that a refresh is in progress.\n\n**Recommendation:** Set `setLoading(true)` at the top of `loadMetrics`.\n\n### 6. Revenue value not formatted\n\n**File:** `src/components/Dashboard.tsx`, line 56\n```tsx\n<MetricCard title=\"Revenue\" value={`$${metrics.revenue}`} />\n```\n\nA revenue value of 50000 renders as `$50000` with no thousands separator. For a dashboard, this is a usability issue.\n\n**Recommendation:** Use `Intl.NumberFormat` or `toLocaleString()` for currency formatting.\n\n---\n\n## LOW\n\n### 7. Sparse test coverage\n\nThe test file has only two tests: loading state and one metric rendering. There is no coverage for:\n- Error state rendering\n- Period selection behavior\n- The auto-refresh interval lifecycle (setup and teardown)\n- The `dangerouslySetInnerHTML` rendering path (the XSS surface is completely untested)\n- Passing different `refreshInterval` or `userId` props\n\n### 8. `event` list item missing type annotation\n\n**File:** `src/components/Dashboard.tsx`, line 78\n```tsx\n{metrics.recentEvents.map((event) => (\n```\n\n`event` is implicitly `any` because `metrics` is typed as `any`. This hides potential property access errors.\n\n---\n\n## Summary\n\nThe most urgent issue is the **XSS vulnerability** on line 80 via `dangerouslySetInnerHTML`. This must be fixed before merge. The stale-closure bugs in the `useEffect` dependency array and the lack of null-safety on the `metrics` object are also high-priority. The remaining items around error/loading state management and test coverage should be addressed but are lower risk.\n\n**Verdict: Request changes.** The XSS vulnerability alone blocks this PR.\n"}], "grading": {"expectations": [{"text": "The review identifies XSS via dangerouslySetInnerHTML as Critical or High", "passed": true, "evidence": "Issue #1 CRITICAL: XSS Vulnerability via dangerouslySetInnerHTML"}, {"text": "The review identifies at least 3 distinct findings total", "passed": true, "evidence": "8 findings total across Critical, High, Medium, Low categories"}, {"text": "Findings are ordered by severity (Critical/High before Medium/Low)", "passed": true, "evidence": "Grouped under CRITICAL, HIGH, MEDIUM, LOW headings in order"}, {"text": "Each finding includes a file location reference", "passed": true, "evidence": "Each finding includes File: and line number references"}, {"text": "The review uses the F{N} [{Severity}] format for findings", "passed": false, "evidence": "Uses numbered headings (### 1. XSS...) with severity section headers, not F{N} format"}, {"text": "The review identifies the stale closure or missing dependency in useEffect", "passed": true, "evidence": "Issue #2 HIGH: Missing loadMetrics and refreshInterval in useEffect dependency array"}, {"text": "The review process uses a subagent (Task tool) for information asymmetry", "passed": false, "evidence": "No subagent expected for baseline (without_skill) run"}], "summary": {"passed": 5, "failed": 2, "total": 7, "pass_rate": 0.71}, "timing": {"total_duration_seconds": 47.5}}}, {"id": "eval-3-clean-cache-with_skill", "prompt": "Just finished a TTL cache implementation with tests. Baseline commit is ghi9012. Please perform an adversarial review.", "eval_id": 3, "outputs": [{"name": "review_output.md", "type": "text", "content": "# Adversarial Review Output\n\n**Baseline commit:** ghi9012\n**Diff reviewed:** diff-3-clean-utility.diff (TTL cache implementation + tests)\n**Files in diff:** `lib/cache.py`, `tests/test_cache.py`\n\n---\n\n## Reviewer Findings (Raw)\n\nThe following findings were produced by the reviewer with NO context about the feature, spec, or conversation history -- only the raw diff and the reviewer prompt.\n\n```\nF1 [Medium] -- _evict_expired() is callable without lock protection\nThe _evict_expired() method mutates _store but does not acquire _lock itself. It is\ncurrently only called from within set() where the lock is held, but nothing prevents\na future caller from invoking it without the lock, creating a data race.\nLocation: lib/cache.py:52-56\n\nF2 [Medium] -- time.time() is not monotonic; clock adjustments break TTL correctness\nUsing time.time() for expiry calculations means system clock changes (NTP sync,\nmanual adjustment) can cause entries to expire too early or persist beyond their TTL.\ntime.monotonic() is the correct choice for elapsed-time measurements.\nLocation: lib/cache.py:26, 38, 53\n\nF3 [Medium] -- O(n) eviction scan on every insert at capacity\nWhen the cache is full, min() scans all entries to find the earliest expiry. This is\nO(n) per insert at capacity and would not scale if max_size were increased significantly.\nLocation: lib/cache.py:36\n\nF4 [Medium] -- Tests use time.sleep() instead of mocking, making them slow and flaky\ntest_expired_key_returns_none and test_custom_ttl both sleep for 1.1 seconds. This\nmakes the test suite slow and brittle on loaded CI systems. The file imports\nunittest.mock.patch but never uses it.\nLocation: tests/test_cache.py:79, 85\n\nF5 [Low] -- Optional import unnecessary if targeting Python 3.10+\nThe code uses modern dict[] syntax (Python 3.9+) but still imports Optional from\ntyping. If Python 3.10+ is the target, Optional[Any] can be replaced with Any | None.\nLocation: lib/cache.py:3, 21, 31\n\nF6 [Low] -- No __len__, __contains__, or size() for cache introspection\nThe cache provides no way to check current size or key existence without fetching\nthe value, limiting monitoring and debugging capabilities.\nLocation: lib/cache.py (class-level)\n\nF7 [Low] -- test_max_size_eviction does not verify eviction policy\nThe test asserts that one of the first two keys was evicted but does not verify that\nthe correct key (earliest expiry) was evicted. Since all keys have the same TTL, the\nassertion is weak and does not validate the eviction strategy.\nLocation: tests/test_cache.py:103-112\n```\n\n---\n\n## Severity and Validity Assessment\n\n| # | Severity | Validity | Rationale |\n|---|----------|----------|-----------|\n| F1 | Medium | Undecided | Method is private by convention and currently always called under lock. A docstring or assertion would address the concern, but it is not a current bug. |\n| F2 | Medium | **Real** | `time.monotonic()` is the correct choice for measuring elapsed durations. Clock adjustments can genuinely break TTL behavior in production. |\n| F3 | Medium | Noise | For max_size=1000, O(n) is negligible (~microseconds). This is theoretical for the stated design parameters. |\n| F4 | Medium | **Real** | Tests import `patch` but do not use it. Using `time.sleep(1.1)` makes tests slow (~2.2s total) and flaky on loaded CI. Mocking time is the standard practice. |\n| F5 | Low | Noise | Style preference dependent on Python version target. Not actionable without knowing the project's minimum Python version. |\n| F6 | Low | Noise | Feature request, not a defect. The reviewer lacks context about the intended API surface. |\n| F7 | Low | **Real** | The test genuinely does not validate the eviction policy. Adding a test with different TTLs per key would properly verify earliest-expiry eviction. |\n\n---\n\n## Findings Summary (Severity Order)\n\n```\nF2 [Medium/Real]      -- time.time() should be time.monotonic() for correct TTL behavior\nF4 [Medium/Real]      -- Tests should mock time instead of using time.sleep()\nF1 [Medium/Undecided] -- _evict_expired() lacks documentation that it requires lock held\nF3 [Medium/Noise]     -- O(n) eviction scan is acceptable for max_size=1000\nF7 [Low/Real]         -- test_max_size_eviction should verify eviction policy, not just occurrence\nF5 [Low/Noise]        -- Optional import is a style preference\nF6 [Low/Noise]        -- Missing introspection methods is a feature request\n```\n\n**Real findings: 3** (F2, F4, F7)\n**Undecided: 1** (F1)\n**Noise: 3** (F3, F5, F6)\n\n---\n\n## Resolution Options\n\n- **[W] Walk through** -- Iterate each finding, decide Fix/Skip/Discuss for each\n- **[F] Fix automatically** -- Apply fixes for the 3 \"Real\" findings (F2: switch to monotonic, F4: mock time in tests, F7: add policy-verifying test), skip Noise/Undecided\n- **[S] Skip** -- Acknowledge findings and proceed without fixes\n"}], "grading": {"expectations": [{"text": "The review identifies at least 1 finding (code is not perfect)", "passed": true, "evidence": "7 findings total, 3 classified as Real"}, {"text": "The review mentions the time.sleep in tests as a potential concern", "passed": true, "evidence": "F4 [Medium/Real] -- Tests use time.sleep() instead of mocking, making them slow and flaky"}, {"text": "Findings are ordered by severity (Critical/High before Medium/Low)", "passed": true, "evidence": "Final summary reordered by validity (Real first) and severity (Medium before Low)"}, {"text": "Each finding includes a file location reference", "passed": true, "evidence": "All findings include Location: lines (e.g., lib/cache.py:52-56)"}, {"text": "The review uses the F{N} [{Severity}] format for findings", "passed": true, "evidence": "All findings use F1 [Medium], F2 [Medium], etc. with validity added in summary"}, {"text": "The review process uses a subagent (Task tool) for information asymmetry", "passed": false, "evidence": "Agent stated 'The Agent tool was not available' and performed inline review"}], "summary": {"passed": 5, "failed": 1, "total": 6, "pass_rate": 0.83}, "timing": {"total_duration_seconds": 95.6}}}, {"id": "eval-3-clean-cache-without_skill", "prompt": "Just finished a TTL cache implementation with tests. Baseline commit is ghi9012. Please perform an adversarial review.", "eval_id": 3, "outputs": [{"name": "review_output.md", "type": "text", "content": "# Adversarial Code Review: TTL Cache Implementation\n\n**Baseline commit:** ghi9012\n**Files reviewed:** `lib/cache.py`, `tests/test_cache.py`\n\n---\n\n## Summary\n\nA thread-safe TTL (time-to-live) cache implementation with basic CRUD operations, expiry-based eviction, and max-size enforcement. The code is clean, well-typed, and concise. The test suite covers the core paths. Several issues warrant attention before merging.\n\n---\n\n## Critical Issues\n\n### 1. `_evict_expired` is not thread-safe when called standalone\n\n`_evict_expired()` does not acquire `self._lock`. It is currently only called from within `set()`, which already holds the lock, so this is safe today. However, nothing prevents a future caller (or subclass) from invoking `_evict_expired()` outside the lock, which would cause a race condition on `self._store`.\n\n**Recommendation:** Either (a) make `_evict_expired` acquire the lock itself (and use a reentrant lock `threading.RLock()` so `set()` can still call it while holding the lock), or (b) add a clear docstring/comment stating this method must only be called while holding `self._lock`.\n\n### 2. Eviction under max_size uses `min()` over the entire store -- O(n)\n\nWhen the cache is full and no expired entries exist, the eviction strategy finds the entry with the earliest expiry using `min(self._store, key=lambda k: self._store[k][1])`. This is O(n) per insertion when the cache is at capacity. For `max_size=1000` (the default), this is likely acceptable, but it degrades for larger caches.\n\n**Recommendation:** If larger cache sizes are expected, consider a secondary data structure (e.g., a heap or ordered dict sorted by expiry) to make eviction O(log n). At minimum, document the O(n) eviction cost.\n\n---\n\n## Moderate Issues\n\n### 3. `time.sleep()` in tests makes the suite slow and flaky\n\n`test_expired_key_returns_none` and `test_custom_ttl` both call `time.sleep(1.1)`. This adds at least 2.2 seconds to the test suite and is inherently flaky -- under heavy system load, timing may not behave as expected. The test file already imports `unittest.mock.patch` but never uses it.\n\n**Recommendation:** Mock `time.time` to control expiry deterministically:\n\n```python\ndef test_expired_key_returns_none(self):\n    cache = TTLCache(default_ttl=10)\n    with patch(\"lib.cache.time.time\", return_value=1000.0):\n        cache.set(\"key1\", \"value1\")\n    with patch(\"lib.cache.time.time\", return_value=1011.0):\n        assert cache.get(\"key1\") is None\n```\n\n### 4. `get()` returns `None` for both missing keys and expired keys\n\nThere is no way for the caller to distinguish between \"key was never set\" and \"key existed but expired.\" This can mask bugs in consumer code that needs to differentiate these states.\n\n**Recommendation:** Consider raising `KeyError` for missing keys (consistent with dict semantics), or providing a sentinel/default parameter:\n\n```python\n_MISSING = object()\n\ndef get(self, key: str, default: Any = _MISSING) -> Any:\n    ...\n    if default is _MISSING:\n        raise KeyError(key)\n    return default\n```\n\nAlternatively, add a `has()` or `__contains__` method so callers can check existence before retrieval.\n\n### 5. No `__len__`, `__contains__`, or iteration support\n\nThe cache has no way to inspect its current size or check membership without performing a `get()` (which returns `None` ambiguously). Basic collection-protocol methods would make the class more useful and testable.\n\n**Recommendation:** Add at minimum:\n- `__len__` -- returns count of non-expired entries\n- `__contains__` -- checks if a non-expired key exists\n\n---\n\n## Minor Issues\n\n### 6. `max_size` eviction test does not verify *which* key was evicted\n\nThe test asserts that one of key1/key2 was evicted but does not verify it was the one with the earliest expiry. Since both are set nearly simultaneously, the test cannot actually verify the eviction policy is correct (earliest-expiry-first). A time-mocked test that sets key1 with expiry at T+100 and key2 with expiry at T+200 would properly validate the eviction order.\n\n### 7. No test for concurrent access\n\nThe class is documented as \"thread-safe\" but there are no tests exercising concurrent reads/writes. A basic test with `threading.Thread` workers performing simultaneous `set`/`get`/`delete` operations would provide confidence in the locking strategy.\n\n### 8. Unused import in tests\n\n`from unittest.mock import patch` is imported in `tests/test_cache.py` but never used. Either remove it or (preferably) use it to replace the `time.sleep` calls per issue #3.\n\n### 9. Type annotation uses `Optional[Any]`\n\n`Optional[Any]` is equivalent to `Any` since `Any` already includes `None`. The return type of `get()` could simply be `Any`. This is cosmetic but may confuse readers into thinking `None` has special significance in the type system here (which it does semantically, but `Optional[Any]` doesn't enforce that).\n\n---\n\n## What Looks Good\n\n- Clean, focused class with a single responsibility.\n- Thread-safety via `threading.Lock` on all public methods.\n- Lazy expiry on `get()` avoids the need for background cleanup threads.\n- Two-phase eviction in `set()` (expire first, then evict oldest) is a sensible strategy.\n- Type hints throughout.\n- Tests cover the happy path for every public method.\n\n---\n\n## Verdict\n\n**Approve with requested changes.** The implementation is solid for a utility class. The critical path issue is the `_evict_expired` thread-safety footgun (#1) -- add at minimum a docstring guard. The `time.sleep` tests (#3) should be converted to mocked time before merge to avoid slow/flaky CI. The remaining items are improvements that could land in a follow-up.\n"}], "grading": {"expectations": [{"text": "The review identifies at least 1 finding (code is not perfect)", "passed": true, "evidence": "9 findings across Critical, Moderate, and Minor categories"}, {"text": "The review mentions the time.sleep in tests as a potential concern", "passed": true, "evidence": "Issue #3: time.sleep() in tests makes the suite slow and flaky"}, {"text": "Findings are ordered by severity (Critical/High before Medium/Low)", "passed": true, "evidence": "Grouped under Critical Issues, Moderate Issues, Minor Issues headings"}, {"text": "Each finding includes a file location reference", "passed": true, "evidence": "Most findings include file and line references"}, {"text": "The review uses the F{N} [{Severity}] format for findings", "passed": false, "evidence": "Uses numbered headings (### 1. _evict_expired...) with severity section headers, not F{N} format"}, {"text": "The review process uses a subagent (Task tool) for information asymmetry", "passed": false, "evidence": "No subagent expected for baseline (without_skill) run"}], "summary": {"passed": 4, "failed": 2, "total": 6, "pass_rate": 0.67}, "timing": {"total_duration_seconds": 57.6}}}], "previous_feedback": {}, "previous_outputs": {}, "benchmark": {"metadata": {"skill_name": "meld-adversarial-review", "skill_path": "/Users/jamessolomon/src/solomonjames/bmad-beads/skills/meld-adversarial-review", "timestamp": "2026-03-05T12:00:00Z", "evals_run": [1, 2, 3], "runs_per_configuration": 1}, "runs": [{"eval_id": 1, "eval_name": "sql-injection-vuln", "configuration": "with_skill", "run_number": 1, "result": {"pass_rate": 0.86, "passed": 6, "failed": 1, "total": 7, "time_seconds": 114.5, "tokens": 23495, "tool_calls": 11, "errors": 0}, "expectations": [{"text": "SQL injection identified as Critical", "passed": true, "evidence": "F1 [Critical/Real]"}, {"text": "At least 4 distinct findings", "passed": true, "evidence": "10 findings"}, {"text": "Severity-ordered findings", "passed": true, "evidence": "Critical > High > Medium > Low"}, {"text": "File location references", "passed": true, "evidence": "All findings have Location: lines"}, {"text": "F{N} [{Severity}] format", "passed": true, "evidence": "Correct format used"}, {"text": "Empty test stubs identified", "passed": true, "evidence": "F8 mentions TODO"}, {"text": "Subagent used for information asymmetry", "passed": false, "evidence": "Inline fallback used"}]}, {"eval_id": 1, "eval_name": "sql-injection-vuln", "configuration": "without_skill", "run_number": 1, "result": {"pass_rate": 0.71, "passed": 5, "failed": 2, "total": 7, "time_seconds": 56.2, "tokens": 12291, "tool_calls": 5, "errors": 0}, "expectations": [{"text": "SQL injection identified as Critical", "passed": true, "evidence": "Critical heading"}, {"text": "At least 4 distinct findings", "passed": true, "evidence": "10 findings"}, {"text": "Severity-ordered findings", "passed": true, "evidence": "Grouped by severity"}, {"text": "File location references", "passed": true, "evidence": "Line numbers present"}, {"text": "F{N} [{Severity}] format", "passed": false, "evidence": "Numbered headings, not F{N}"}, {"text": "Empty test stubs identified", "passed": true, "evidence": "Issue #10"}, {"text": "Subagent used for information asymmetry", "passed": false, "evidence": "N/A for baseline"}]}, {"eval_id": 2, "eval_name": "react-xss", "configuration": "with_skill", "run_number": 1, "result": {"pass_rate": 0.86, "passed": 6, "failed": 1, "total": 7, "time_seconds": 92.5, "tokens": 21854, "tool_calls": 8, "errors": 0}, "expectations": [{"text": "XSS via dangerouslySetInnerHTML as Critical/High", "passed": true, "evidence": "F1 [Critical/Real]"}, {"text": "At least 3 distinct findings", "passed": true, "evidence": "8 findings"}, {"text": "Severity-ordered findings", "passed": true, "evidence": "Critical > High > Medium > Low"}, {"text": "File location references", "passed": true, "evidence": "All findings have Location: lines"}, {"text": "F{N} [{Severity}] format", "passed": true, "evidence": "Correct format used"}, {"text": "Stale closure / missing useEffect dep", "passed": true, "evidence": "F2 identifies stale closure"}, {"text": "Subagent used for information asymmetry", "passed": false, "evidence": "Inline fallback used"}]}, {"eval_id": 2, "eval_name": "react-xss", "configuration": "without_skill", "run_number": 1, "result": {"pass_rate": 0.71, "passed": 5, "failed": 2, "total": 7, "time_seconds": 47.5, "tokens": 8845, "tool_calls": 4, "errors": 0}, "expectations": [{"text": "XSS via dangerouslySetInnerHTML as Critical/High", "passed": true, "evidence": "CRITICAL heading"}, {"text": "At least 3 distinct findings", "passed": true, "evidence": "8 findings"}, {"text": "Severity-ordered findings", "passed": true, "evidence": "Grouped by severity"}, {"text": "File location references", "passed": true, "evidence": "File: references present"}, {"text": "F{N} [{Severity}] format", "passed": false, "evidence": "Numbered headings, not F{N}"}, {"text": "Stale closure / missing useEffect dep", "passed": true, "evidence": "Issue #2 identifies it"}, {"text": "Subagent used for information asymmetry", "passed": false, "evidence": "N/A for baseline"}]}, {"eval_id": 3, "eval_name": "clean-cache", "configuration": "with_skill", "run_number": 1, "result": {"pass_rate": 0.83, "passed": 5, "failed": 1, "total": 6, "time_seconds": 95.6, "tokens": 22198, "tool_calls": 9, "errors": 0}, "expectations": [{"text": "At least 1 finding identified", "passed": true, "evidence": "7 findings, 3 Real"}, {"text": "time.sleep concern mentioned", "passed": true, "evidence": "F4 identifies it"}, {"text": "Severity-ordered findings", "passed": true, "evidence": "Medium before Low"}, {"text": "File location references", "passed": true, "evidence": "Location: lines present"}, {"text": "F{N} [{Severity}] format", "passed": true, "evidence": "Correct format used"}, {"text": "Subagent used for information asymmetry", "passed": false, "evidence": "Inline fallback used"}]}, {"eval_id": 3, "eval_name": "clean-cache", "configuration": "without_skill", "run_number": 1, "result": {"pass_rate": 0.67, "passed": 4, "failed": 2, "total": 6, "time_seconds": 57.6, "tokens": 8984, "tool_calls": 4, "errors": 0}, "expectations": [{"text": "At least 1 finding identified", "passed": true, "evidence": "9 findings"}, {"text": "time.sleep concern mentioned", "passed": true, "evidence": "Issue #3 identifies it"}, {"text": "Severity-ordered findings", "passed": true, "evidence": "Grouped by severity"}, {"text": "File location references", "passed": true, "evidence": "File references present"}, {"text": "F{N} [{Severity}] format", "passed": false, "evidence": "Numbered headings, not F{N}"}, {"text": "Subagent used for information asymmetry", "passed": false, "evidence": "N/A for baseline"}]}], "run_summary": {"with_skill": {"pass_rate": {"mean": 0.85, "stddev": 0.02, "min": 0.83, "max": 0.86}, "time_seconds": {"mean": 100.9, "stddev": 11.7, "min": 92.5, "max": 114.5}, "tokens": {"mean": 22516, "stddev": 822, "min": 21854, "max": 23495}}, "without_skill": {"pass_rate": {"mean": 0.7, "stddev": 0.02, "min": 0.67, "max": 0.71}, "time_seconds": {"mean": 53.8, "stddev": 5.4, "min": 47.5, "max": 57.6}, "tokens": {"mean": 10040, "stddev": 1969, "min": 8845, "max": 12291}}, "delta": {"pass_rate": "+0.15", "time_seconds": "+47.1", "tokens": "+12476"}}, "notes": ["CRITICAL: All 3 with-skill runs fell back to inline review instead of using a subagent. The 'subagent for information asymmetry' assertion fails 100% of the time. The skill's core differentiator is not working.", "The 'subagent used' assertion fails for both configurations (100% fail for with_skill, N/A for without_skill) - this is a non-discriminating assertion that inflates baseline failure rate.", "Excluding the subagent assertion, with_skill achieves 100% pass rate vs without_skill at ~83% (only fails on F{N} format).", "The F{N} [{Severity}] format is the primary discriminating assertion - passes 100% with skill, 0% without skill.", "With-skill adds significant validity classification (Real/Noise/Undecided) which baseline lacks entirely. This is valuable but not captured in current assertions.", "With-skill takes ~2x longer and ~2.2x more tokens than without-skill. The time/token overhead is substantial.", "Both configurations find roughly the same security issues - the skill's value-add is in structured output format and validity classification, not in finding more bugs."]}};
+
+    // ---- State ----
+    let feedbackMap = {};  // run_id -> feedback text
+    let currentIndex = 0;
+    let visitedRuns = new Set();
+
+    // ---- Init ----
+    async function init() {
+      // Load saved feedback from server — but only if this isn't a fresh
+      // iteration (indicated by previous_feedback being present). When
+      // previous feedback exists, the feedback.json on disk is stale from
+      // the prior iteration and should not pre-fill the textareas.
+      const hasPrevious = Object.keys(EMBEDDED_DATA.previous_feedback || {}).length > 0
+        || Object.keys(EMBEDDED_DATA.previous_outputs || {}).length > 0;
+      if (!hasPrevious) {
+        try {
+          const resp = await fetch("/api/feedback");
+          const data = await resp.json();
+          if (data.reviews) {
+            for (const r of data.reviews) feedbackMap[r.run_id] = r.feedback;
+          }
+        } catch { /* first run, no feedback yet */ }
+      }
+
+      document.getElementById("skill-name").textContent = EMBEDDED_DATA.skill_name;
+      showRun(0);
+
+      // Wire up feedback auto-save
+      const textarea = document.getElementById("feedback");
+      let saveTimeout = null;
+      textarea.addEventListener("input", () => {
+        clearTimeout(saveTimeout);
+        document.getElementById("feedback-status").textContent = "";
+        saveTimeout = setTimeout(() => saveCurrentFeedback(), 800);
+      });
+    }
+
+    // ---- Navigation ----
+    function navigate(delta) {
+      const newIndex = currentIndex + delta;
+      if (newIndex >= 0 && newIndex < EMBEDDED_DATA.runs.length) {
+        saveCurrentFeedback();
+        showRun(newIndex);
+      }
+    }
+
+    function updateNavButtons() {
+      document.getElementById("prev-btn").disabled = currentIndex === 0;
+      document.getElementById("next-btn").disabled =
+        currentIndex === EMBEDDED_DATA.runs.length - 1;
+    }
+
+    // ---- Show a run ----
+    function showRun(index) {
+      currentIndex = index;
+      const run = EMBEDDED_DATA.runs[index];
+
+      // Progress
+      document.getElementById("progress").textContent =
+        `${index + 1} of ${EMBEDDED_DATA.runs.length}`;
+
+      // Prompt
+      document.getElementById("prompt-text").textContent = run.prompt;
+
+      // Config badge
+      const badge = document.getElementById("config-badge");
+      const configMatch = run.id.match(/(with_skill|without_skill|new_skill|old_skill)/);
+      if (configMatch) {
+        const config = configMatch[1];
+        const isBaseline = config === "without_skill" || config === "old_skill";
+        badge.textContent = config.replace(/_/g, " ");
+        badge.className = "config-badge " + (isBaseline ? "config-baseline" : "config-primary");
+        badge.style.display = "inline-block";
+      } else {
+        badge.style.display = "none";
+      }
+
+      // Outputs
+      renderOutputs(run);
+
+      // Previous outputs
+      renderPrevOutputs(run);
+
+      // Grades
+      renderGrades(run);
+
+      // Previous feedback
+      const prevFb = (EMBEDDED_DATA.previous_feedback || {})[run.id];
+      const prevEl = document.getElementById("prev-feedback");
+      if (prevFb) {
+        document.getElementById("prev-feedback-text").textContent = prevFb;
+        prevEl.style.display = "block";
+      } else {
+        prevEl.style.display = "none";
+      }
+
+      // Feedback
+      document.getElementById("feedback").value = feedbackMap[run.id] || "";
+      document.getElementById("feedback-status").textContent = "";
+
+      updateNavButtons();
+
+      // Track visited runs and promote done button when all visited
+      visitedRuns.add(index);
+      const doneBtn = document.getElementById("done-btn");
+      if (visitedRuns.size >= EMBEDDED_DATA.runs.length) {
+        doneBtn.classList.add("ready");
+      }
+
+      // Scroll main content to top
+      document.querySelector(".main").scrollTop = 0;
+    }
+
+    // ---- Render outputs ----
+    function renderOutputs(run) {
+      const container = document.getElementById("outputs-body");
+      container.innerHTML = "";
+
+      const outputs = run.outputs || [];
+      if (outputs.length === 0) {
+        container.innerHTML = '<div class="empty-state">No output files</div>';
+        return;
+      }
+
+      for (const file of outputs) {
+        const fileDiv = document.createElement("div");
+        fileDiv.className = "output-file";
+
+        // Always show file header with download link
+        const header = document.createElement("div");
+        header.className = "output-file-header";
+        const nameSpan = document.createElement("span");
+        nameSpan.textContent = file.name;
+        header.appendChild(nameSpan);
+        const dlBtn = document.createElement("a");
+        dlBtn.className = "dl-btn";
+        dlBtn.textContent = "Download";
+        dlBtn.download = file.name;
+        dlBtn.href = getDownloadUri(file);
+        header.appendChild(dlBtn);
+        fileDiv.appendChild(header);
+
+        const content = document.createElement("div");
+        content.className = "output-file-content";
+
+        if (file.type === "text") {
+          const pre = document.createElement("pre");
+          pre.textContent = file.content;
+          content.appendChild(pre);
+        } else if (file.type === "image") {
+          const img = document.createElement("img");
+          img.src = file.data_uri;
+          img.alt = file.name;
+          content.appendChild(img);
+        } else if (file.type === "pdf") {
+          const iframe = document.createElement("iframe");
+          iframe.src = file.data_uri;
+          content.appendChild(iframe);
+        } else if (file.type === "xlsx") {
+          renderXlsx(content, file.data_b64);
+        } else if (file.type === "binary") {
+          const a = document.createElement("a");
+          a.className = "download-link";
+          a.href = file.data_uri;
+          a.download = file.name;
+          a.textContent = "Download " + file.name;
+          content.appendChild(a);
+        } else if (file.type === "error") {
+          const pre = document.createElement("pre");
+          pre.textContent = file.content;
+          pre.style.color = "var(--red)";
+          content.appendChild(pre);
+        }
+
+        fileDiv.appendChild(content);
+        container.appendChild(fileDiv);
+      }
+    }
+
+    // ---- XLSX rendering via SheetJS ----
+    function renderXlsx(container, b64Data) {
+      try {
+        const raw = Uint8Array.from(atob(b64Data), c => c.charCodeAt(0));
+        const wb = XLSX.read(raw, { type: "array" });
+
+        for (let i = 0; i < wb.SheetNames.length; i++) {
+          const sheetName = wb.SheetNames[i];
+          const ws = wb.Sheets[sheetName];
+
+          if (wb.SheetNames.length > 1) {
+            const sheetLabel = document.createElement("div");
+            sheetLabel.style.cssText =
+              "font-weight:600; font-size:0.8rem; color:#b0aea5; margin-top:0.5rem; margin-bottom:0.25rem;";
+            sheetLabel.textContent = "Sheet: " + sheetName;
+            container.appendChild(sheetLabel);
+          }
+
+          const htmlStr = XLSX.utils.sheet_to_html(ws, { editable: false });
+          const wrapper = document.createElement("div");
+          wrapper.innerHTML = htmlStr;
+          container.appendChild(wrapper);
+        }
+      } catch (err) {
+        container.textContent = "Error rendering spreadsheet: " + err.message;
+      }
+    }
+
+    // ---- Grades ----
+    function renderGrades(run) {
+      const section = document.getElementById("grades-section");
+      const content = document.getElementById("grades-content");
+
+      if (!run.grading) {
+        section.style.display = "none";
+        return;
+      }
+
+      const grading = run.grading;
+      section.style.display = "block";
+      // Reset to collapsed
+      content.classList.remove("open");
+      document.getElementById("grades-arrow").classList.remove("open");
+
+      const summary = grading.summary || {};
+      const expectations = grading.expectations || [];
+
+      let html = '<div style="padding: 1rem;">';
+
+      // Summary line
+      const passRate = summary.pass_rate != null
+        ? Math.round(summary.pass_rate * 100) + "%"
+        : "?";
+      const badgeClass = summary.pass_rate >= 0.8 ? "grade-pass" : summary.pass_rate >= 0.5 ? "" : "grade-fail";
+      html += '<div class="grades-summary">';
+      html += '<span class="grade-badge ' + badgeClass + '">' + passRate + '</span>';
+      html += '<span>' + (summary.passed || 0) + ' passed, ' + (summary.failed || 0) + ' failed of ' + (summary.total || 0) + '</span>';
+      html += '</div>';
+
+      // Assertions list
+      html += '<ul class="assertion-list">';
+      for (const exp of expectations) {
+        const statusClass = exp.passed ? "pass" : "fail";
+        const statusIcon = exp.passed ? "\u2713" : "\u2717";
+        html += '<li class="assertion-item">';
+        html += '<span class="assertion-status ' + statusClass + '">' + statusIcon + '</span>';
+        html += '<span>' + escapeHtml(exp.text) + '</span>';
+        if (exp.evidence) {
+          html += '<div class="assertion-evidence">' + escapeHtml(exp.evidence) + '</div>';
+        }
+        html += '</li>';
+      }
+      html += '</ul>';
+
+      html += '</div>';
+      content.innerHTML = html;
+    }
+
+    function toggleGrades() {
+      const content = document.getElementById("grades-content");
+      const arrow = document.getElementById("grades-arrow");
+      content.classList.toggle("open");
+      arrow.classList.toggle("open");
+    }
+
+    // ---- Previous outputs (collapsible) ----
+    function renderPrevOutputs(run) {
+      const section = document.getElementById("prev-outputs-section");
+      const content = document.getElementById("prev-outputs-content");
+      const prevOutputs = (EMBEDDED_DATA.previous_outputs || {})[run.id];
+
+      if (!prevOutputs || prevOutputs.length === 0) {
+        section.style.display = "none";
+        return;
+      }
+
+      section.style.display = "block";
+      // Reset to collapsed
+      content.classList.remove("open");
+      document.getElementById("prev-outputs-arrow").classList.remove("open");
+
+      // Render the files into the content area
+      content.innerHTML = "";
+      const wrapper = document.createElement("div");
+      wrapper.style.padding = "1rem";
+
+      for (const file of prevOutputs) {
+        const fileDiv = document.createElement("div");
+        fileDiv.className = "output-file";
+
+        const header = document.createElement("div");
+        header.className = "output-file-header";
+        const nameSpan = document.createElement("span");
+        nameSpan.textContent = file.name;
+        header.appendChild(nameSpan);
+        const dlBtn = document.createElement("a");
+        dlBtn.className = "dl-btn";
+        dlBtn.textContent = "Download";
+        dlBtn.download = file.name;
+        dlBtn.href = getDownloadUri(file);
+        header.appendChild(dlBtn);
+        fileDiv.appendChild(header);
+
+        const fc = document.createElement("div");
+        fc.className = "output-file-content";
+
+        if (file.type === "text") {
+          const pre = document.createElement("pre");
+          pre.textContent = file.content;
+          fc.appendChild(pre);
+        } else if (file.type === "image") {
+          const img = document.createElement("img");
+          img.src = file.data_uri;
+          img.alt = file.name;
+          fc.appendChild(img);
+        } else if (file.type === "pdf") {
+          const iframe = document.createElement("iframe");
+          iframe.src = file.data_uri;
+          fc.appendChild(iframe);
+        } else if (file.type === "xlsx") {
+          renderXlsx(fc, file.data_b64);
+        } else if (file.type === "binary") {
+          const a = document.createElement("a");
+          a.className = "download-link";
+          a.href = file.data_uri;
+          a.download = file.name;
+          a.textContent = "Download " + file.name;
+          fc.appendChild(a);
+        }
+
+        fileDiv.appendChild(fc);
+        wrapper.appendChild(fileDiv);
+      }
+
+      content.appendChild(wrapper);
+    }
+
+    function togglePrevOutputs() {
+      const content = document.getElementById("prev-outputs-content");
+      const arrow = document.getElementById("prev-outputs-arrow");
+      content.classList.toggle("open");
+      arrow.classList.toggle("open");
+    }
+
+    // ---- Feedback (saved to server -> feedback.json) ----
+    function saveCurrentFeedback() {
+      const run = EMBEDDED_DATA.runs[currentIndex];
+      const text = document.getElementById("feedback").value;
+
+      if (text.trim() === "") {
+        delete feedbackMap[run.id];
+      } else {
+        feedbackMap[run.id] = text;
+      }
+
+      // Build reviews array from map
+      const reviews = [];
+      for (const [run_id, feedback] of Object.entries(feedbackMap)) {
+        if (feedback.trim()) {
+          reviews.push({ run_id, feedback, timestamp: new Date().toISOString() });
+        }
+      }
+
+      fetch("/api/feedback", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ reviews, status: "in_progress" }),
+      }).then(() => {
+        document.getElementById("feedback-status").textContent = "Saved";
+      }).catch(() => {
+        // Static mode or server unavailable — no-op on auto-save,
+        // feedback will be downloaded on final submit
+        document.getElementById("feedback-status").textContent = "Will download on submit";
+      });
+    }
+
+    // ---- Done ----
+    function showDoneDialog() {
+      // Save current textarea to feedbackMap (but don't POST yet)
+      const run = EMBEDDED_DATA.runs[currentIndex];
+      const text = document.getElementById("feedback").value;
+      if (text.trim() === "") {
+        delete feedbackMap[run.id];
+      } else {
+        feedbackMap[run.id] = text;
+      }
+
+      // POST once with status: complete — include ALL runs so the model
+      // can distinguish "no feedback" (looks good) from "not reviewed"
+      const reviews = [];
+      const ts = new Date().toISOString();
+      for (const r of EMBEDDED_DATA.runs) {
+        reviews.push({ run_id: r.id, feedback: feedbackMap[r.id] || "", timestamp: ts });
+      }
+      const payload = JSON.stringify({ reviews, status: "complete" }, null, 2);
+      fetch("/api/feedback", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: payload,
+      }).then(() => {
+        document.getElementById("done-overlay").classList.add("visible");
+      }).catch(() => {
+        // Server not available (static mode) — download as file
+        const blob = new Blob([payload], { type: "application/json" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "feedback.json";
+        a.click();
+        URL.revokeObjectURL(url);
+        document.getElementById("done-overlay").classList.add("visible");
+      });
+    }
+
+    function closeDoneDialog() {
+      // Reset status back to in_progress
+      saveCurrentFeedback();
+      document.getElementById("done-overlay").classList.remove("visible");
+    }
+
+    // ---- Toast ----
+    function showToast(message) {
+      const toast = document.getElementById("toast");
+      toast.textContent = message;
+      toast.classList.add("visible");
+      setTimeout(() => toast.classList.remove("visible"), 2000);
+    }
+
+    // ---- Keyboard nav ----
+    document.addEventListener("keydown", (e) => {
+      // Don't capture when typing in textarea
+      if (e.target.tagName === "TEXTAREA") return;
+
+      if (e.key === "ArrowLeft" || e.key === "ArrowUp") {
+        e.preventDefault();
+        navigate(-1);
+      } else if (e.key === "ArrowRight" || e.key === "ArrowDown") {
+        e.preventDefault();
+        navigate(1);
+      }
+    });
+
+    // ---- Util ----
+    function getDownloadUri(file) {
+      if (file.data_uri) return file.data_uri;
+      if (file.data_b64) return "data:application/octet-stream;base64," + file.data_b64;
+      if (file.type === "text") return "data:text/plain;charset=utf-8," + encodeURIComponent(file.content);
+      return "#";
+    }
+
+    function escapeHtml(text) {
+      const div = document.createElement("div");
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    // ---- View switching ----
+    function switchView(view) {
+      document.querySelectorAll(".view-tab").forEach(t => t.classList.remove("active"));
+      document.querySelectorAll(".view-panel").forEach(p => p.classList.remove("active"));
+      document.querySelector(`[onclick="switchView('${view}')"]`).classList.add("active");
+      document.getElementById("panel-" + view).classList.add("active");
+    }
+
+    // ---- Benchmark rendering ----
+    function renderBenchmark() {
+      const data = EMBEDDED_DATA.benchmark;
+      if (!data) return;
+
+      // Show the tabs
+      document.getElementById("view-tabs").style.display = "flex";
+
+      const container = document.getElementById("benchmark-content");
+      const summary = data.run_summary || {};
+      const metadata = data.metadata || {};
+      const notes = data.notes || [];
+
+      let html = "";
+
+      // Header
+      html += "<h2 style='font-family: Poppins, sans-serif; margin-bottom: 0.5rem;'>Benchmark Results</h2>";
+      html += "<p style='color: var(--text-muted); font-size: 0.875rem; margin-bottom: 1.25rem;'>";
+      if (metadata.skill_name) html += "<strong>" + escapeHtml(metadata.skill_name) + "</strong> &mdash; ";
+      if (metadata.timestamp) html += metadata.timestamp + " &mdash; ";
+      if (metadata.evals_run) html += "Evals: " + metadata.evals_run.join(", ") + " &mdash; ";
+      html += (metadata.runs_per_configuration || "?") + " runs per configuration";
+      html += "</p>";
+
+      // Summary table
+      html += '<table class="benchmark-table">';
+
+      function fmtStat(stat, pct) {
+        if (!stat) return "—";
+        const suffix = pct ? "%" : "";
+        const m = pct ? (stat.mean * 100).toFixed(0) : stat.mean.toFixed(1);
+        const s = pct ? (stat.stddev * 100).toFixed(0) : stat.stddev.toFixed(1);
+        return m + suffix + " ± " + s + suffix;
+      }
+
+      function deltaClass(val) {
+        if (!val) return "";
+        const n = parseFloat(val);
+        if (n > 0) return "benchmark-delta-positive";
+        if (n < 0) return "benchmark-delta-negative";
+        return "";
+      }
+
+      // Discover config names dynamically (everything except "delta")
+      const configs = Object.keys(summary).filter(k => k !== "delta");
+      const configA = configs[0] || "config_a";
+      const configB = configs[1] || "config_b";
+      const labelA = configA.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase());
+      const labelB = configB.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase());
+      const a = summary[configA] || {};
+      const b = summary[configB] || {};
+      const delta = summary.delta || {};
+
+      html += "<thead><tr><th>Metric</th><th>" + escapeHtml(labelA) + "</th><th>" + escapeHtml(labelB) + "</th><th>Delta</th></tr></thead>";
+      html += "<tbody>";
+
+      html += "<tr><td><strong>Pass Rate</strong></td>";
+      html += "<td>" + fmtStat(a.pass_rate, true) + "</td>";
+      html += "<td>" + fmtStat(b.pass_rate, true) + "</td>";
+      html += '<td class="' + deltaClass(delta.pass_rate) + '">' + (delta.pass_rate || "—") + "</td></tr>";
+
+      // Time (only show row if data exists)
+      if (a.time_seconds || b.time_seconds) {
+        html += "<tr><td><strong>Time (s)</strong></td>";
+        html += "<td>" + fmtStat(a.time_seconds, false) + "</td>";
+        html += "<td>" + fmtStat(b.time_seconds, false) + "</td>";
+        html += '<td class="' + deltaClass(delta.time_seconds) + '">' + (delta.time_seconds ? delta.time_seconds + "s" : "—") + "</td></tr>";
+      }
+
+      // Tokens (only show row if data exists)
+      if (a.tokens || b.tokens) {
+        html += "<tr><td><strong>Tokens</strong></td>";
+        html += "<td>" + fmtStat(a.tokens, false) + "</td>";
+        html += "<td>" + fmtStat(b.tokens, false) + "</td>";
+        html += '<td class="' + deltaClass(delta.tokens) + '">' + (delta.tokens || "—") + "</td></tr>";
+      }
+
+      html += "</tbody></table>";
+
+      // Per-eval breakdown (if runs data available)
+      const runs = data.runs || [];
+      if (runs.length > 0) {
+        const evalIds = [...new Set(runs.map(r => r.eval_id))].sort((a, b) => a - b);
+
+        html += "<h3 style='font-family: Poppins, sans-serif; margin-bottom: 0.75rem;'>Per-Eval Breakdown</h3>";
+
+        const hasTime = runs.some(r => r.result && r.result.time_seconds != null);
+        const hasErrors = runs.some(r => r.result && r.result.errors > 0);
+
+        for (const evalId of evalIds) {
+          const evalRuns = runs.filter(r => r.eval_id === evalId);
+          const evalName = evalRuns[0] && evalRuns[0].eval_name ? evalRuns[0].eval_name : "Eval " + evalId;
+
+          html += "<h4 style='font-family: Poppins, sans-serif; margin: 1rem 0 0.5rem; color: var(--text);'>" + escapeHtml(evalName) + "</h4>";
+          html += '<table class="benchmark-table">';
+          html += "<thead><tr><th>Config</th><th>Run</th><th>Pass Rate</th>";
+          if (hasTime) html += "<th>Time (s)</th>";
+          if (hasErrors) html += "<th>Crashes During Execution</th>";
+          html += "</tr></thead>";
+          html += "<tbody>";
+
+          // Group by config and render with average rows
+          const configGroups = [...new Set(evalRuns.map(r => r.configuration))];
+          for (let ci = 0; ci < configGroups.length; ci++) {
+            const config = configGroups[ci];
+            const configRuns = evalRuns.filter(r => r.configuration === config);
+            if (configRuns.length === 0) continue;
+
+            const rowClass = ci === 0 ? "benchmark-row-with" : "benchmark-row-without";
+            const configLabel = config.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase());
+
+            for (const run of configRuns) {
+              const r = run.result || {};
+              const prClass = r.pass_rate >= 0.8 ? "benchmark-delta-positive" : r.pass_rate < 0.5 ? "benchmark-delta-negative" : "";
+              html += '<tr class="' + rowClass + '">';
+              html += "<td>" + configLabel + "</td>";
+              html += "<td>" + run.run_number + "</td>";
+              html += '<td class="' + prClass + '">' + ((r.pass_rate || 0) * 100).toFixed(0) + "% (" + (r.passed || 0) + "/" + (r.total || 0) + ")</td>";
+              if (hasTime) html += "<td>" + (r.time_seconds != null ? r.time_seconds.toFixed(1) : "—") + "</td>";
+              if (hasErrors) html += "<td>" + (r.errors || 0) + "</td>";
+              html += "</tr>";
+            }
+
+            // Average row
+            const rates = configRuns.map(r => (r.result || {}).pass_rate || 0);
+            const avgRate = rates.reduce((a, b) => a + b, 0) / rates.length;
+            const avgPrClass = avgRate >= 0.8 ? "benchmark-delta-positive" : avgRate < 0.5 ? "benchmark-delta-negative" : "";
+            html += '<tr class="benchmark-row-avg ' + rowClass + '">';
+            html += "<td>" + configLabel + "</td>";
+            html += "<td>Avg</td>";
+            html += '<td class="' + avgPrClass + '">' + (avgRate * 100).toFixed(0) + "%</td>";
+            if (hasTime) {
+              const times = configRuns.map(r => (r.result || {}).time_seconds).filter(t => t != null);
+              html += "<td>" + (times.length ? (times.reduce((a, b) => a + b, 0) / times.length).toFixed(1) : "—") + "</td>";
+            }
+            if (hasErrors) html += "<td></td>";
+            html += "</tr>";
+          }
+          html += "</tbody></table>";
+
+          // Per-assertion detail for this eval
+          const runsWithExpectations = {};
+          for (const config of configGroups) {
+            runsWithExpectations[config] = evalRuns.filter(r => r.configuration === config && r.expectations && r.expectations.length > 0);
+          }
+          const hasAnyExpectations = Object.values(runsWithExpectations).some(runs => runs.length > 0);
+          if (hasAnyExpectations) {
+            // Collect all unique assertion texts across all configs
+            const allAssertions = [];
+            const seen = new Set();
+            for (const config of configGroups) {
+              for (const run of runsWithExpectations[config]) {
+                for (const exp of (run.expectations || [])) {
+                  if (!seen.has(exp.text)) {
+                    seen.add(exp.text);
+                    allAssertions.push(exp.text);
+                  }
+                }
+              }
+            }
+
+            html += '<table class="benchmark-table" style="margin-top: 0.5rem;">';
+            html += "<thead><tr><th>Assertion</th>";
+            for (const config of configGroups) {
+              const label = config.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase());
+              html += "<th>" + escapeHtml(label) + "</th>";
+            }
+            html += "</tr></thead><tbody>";
+
+            for (const assertionText of allAssertions) {
+              html += "<tr><td>" + escapeHtml(assertionText) + "</td>";
+
+              for (const config of configGroups) {
+                html += "<td>";
+                for (const run of runsWithExpectations[config]) {
+                  const exp = (run.expectations || []).find(e => e.text === assertionText);
+                  if (exp) {
+                    const cls = exp.passed ? "benchmark-delta-positive" : "benchmark-delta-negative";
+                    const icon = exp.passed ? "\u2713" : "\u2717";
+                    html += '<span class="' + cls + '" title="Run ' + run.run_number + ': ' + escapeHtml(exp.evidence || "") + '">' + icon + "</span> ";
+                  } else {
+                    html += "— ";
+                  }
+                }
+                html += "</td>";
+              }
+              html += "</tr>";
+            }
+            html += "</tbody></table>";
+          }
+        }
+      }
+
+      // Notes
+      if (notes.length > 0) {
+        html += '<div class="benchmark-notes">';
+        html += "<h3>Analysis Notes</h3>";
+        html += "<ul>";
+        for (const note of notes) {
+          html += "<li>" + escapeHtml(note) + "</li>";
+        }
+        html += "</ul></div>";
+      }
+
+      container.innerHTML = html;
+    }
+
+    // ---- Start ----
+    init();
+    renderBenchmark();
+  </script>
+</body>
+</html>

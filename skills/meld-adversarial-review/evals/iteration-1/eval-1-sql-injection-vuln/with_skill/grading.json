@@ -1,0 +1,48 @@
+{
+  "expectations": [
+    {
+      "text": "The review identifies SQL injection as a Critical finding",
+      "passed": true,
+      "evidence": "F1 [Critical/Real] -- SQL Injection via string interpolation in all queries"
+    },
+    {
+      "text": "The review identifies at least 4 distinct findings total",
+      "passed": true,
+      "evidence": "10 findings total (F1-F10)"
+    },
+    {
+      "text": "Findings are ordered by severity (Critical/High before Medium/Low)",
+      "passed": true,
+      "evidence": "F1-F2 Critical, F3-F7 High, F8-F9 Medium, F10 Low"
+    },
+    {
+      "text": "Each finding includes a file location reference",
+      "passed": true,
+      "evidence": "Every finding has a Location: line with file:line references"
+    },
+    {
+      "text": "The review uses the F{N} [{Severity}] format for findings",
+      "passed": true,
+      "evidence": "All findings use F1 [Critical/Real], F2 [Critical/Real], etc."
+    },
+    {
+      "text": "The review identifies the missing/empty test stubs as a finding",
+      "passed": true,
+      "evidence": "F8 [Medium/Real] -- Tests lack coverage for critical paths. Mentions DELETE tests contain only a TODO comment."
+    },
+    {
+      "text": "The review process uses a subagent (Task tool) for information asymmetry",
+      "passed": false,
+      "evidence": "Agent stated 'the Agent tool was not available' and performed inline review instead. The skill's fallback was used rather than true information asymmetry."
+    }
+  ],
+  "summary": {
+    "passed": 6,
+    "failed": 1,
+    "total": 7,
+    "pass_rate": 0.86
+  },
+  "timing": {
+    "total_duration_seconds": 114.5
+  }
+}

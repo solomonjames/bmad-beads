@@ -1,0 +1,76 @@
+{
+  "skill_name": "meld-adversarial-review",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "I've finished implementing CRUD endpoints for user management. The baseline commit is abc1234. Please do an adversarial review of my changes.",
+      "expected_output": "Should identify SQL injection vulnerabilities, missing input validation, weak password requirements, missing auth checks, XSS via unsanitized search, and empty test stubs. Findings should be severity-ordered with Critical first.",
+      "files": ["eval-files/diff-1-sql-injection.diff"],
+      "expectations": [
+        "The review identifies SQL injection as a Critical finding",
+        "The review identifies at least 4 distinct findings total",
+        "Findings are ordered by severity (Critical/High before Medium/Low)",
+        "Each finding includes a file location reference",
+        "The review uses the F{N} [{Severity}] format for findings",
+        "The review identifies the missing/empty test stubs as a finding",
+        "The review process uses a subagent (Agent tool) for information asymmetry",
+        "Each finding is classified with a validity label (Real, Noise, or Undecided)",
+        "The output includes a summary table with severity counts and validity breakdown",
+        "The output presents resolution options [W], [F], [S] at the end"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Implementation of the Dashboard component is done. Baseline commit is def5678. Run an adversarial review on the diff.",
+      "expected_output": "Should catch XSS via dangerouslySetInnerHTML, stale closure in useEffect, any type usage, missing error boundary, missing test coverage.",
+      "files": ["eval-files/diff-2-react-component.diff"],
+      "expectations": [
+        "The review identifies XSS via dangerouslySetInnerHTML as Critical or High",
+        "The review identifies at least 3 distinct findings total",
+        "Findings are ordered by severity (Critical/High before Medium/Low)",
+        "Each finding includes a file location reference",
+        "The review uses the F{N} [{Severity}] format for findings",
+        "The review identifies the stale closure or missing dependency in useEffect",
+        "The review process uses a subagent (Agent tool) for information asymmetry",
+        "Each finding is classified with a validity label (Real, Noise, or Undecided)",
+        "The output includes a summary table with severity counts and validity breakdown",
+        "The output presents resolution options [W], [F], [S] at the end"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "Just finished a TTL cache implementation with tests. Baseline commit is ghi9012. Please perform an adversarial review.",
+      "expected_output": "Should find fewer issues since code is relatively clean. Might note: tests use real time.sleep, no size property, _evict_expired called inside lock.",
+      "files": ["eval-files/diff-3-clean-utility.diff"],
+      "expectations": [
+        "The review identifies at least 1 finding (code is not perfect)",
+        "The review mentions the time.sleep in tests as a potential concern",
+        "Findings are ordered by severity (Critical/High before Medium/Low)",
+        "Each finding includes a file location reference",
+        "The review uses the F{N} [{Severity}] format for findings",
+        "The review process uses a subagent (Agent tool) for information asymmetry",
+        "Each finding is classified with a validity label (Real, Noise, or Undecided)",
+        "The output includes a summary table with severity counts and validity breakdown",
+        "The output presents resolution options [W], [F], [S] at the end"
+      ]
+    },
+    {
+      "id": 4,
+      "prompt": "Finished the auth middleware, admin routes, and profile routes. Baseline commit is jkl3456. Please do an adversarial review of the full diff.",
+      "expected_output": "Should catch: hardcoded JWT secret, SQL injection in audit-log query (params built but string interpolation used), password change without verifying current password, SELECT * returning password hash in profile GET, test uses hardcoded secret, empty test stubs.",
+      "files": ["eval-files/diff-4-multifile-auth.diff"],
+      "expectations": [
+        "The review identifies the hardcoded JWT secret as Critical or High",
+        "The review identifies SQL injection in the audit-log endpoint",
+        "The review identifies that password change skips current password verification",
+        "The review identifies at least 5 distinct findings total",
+        "Findings are ordered by severity (Critical/High before Medium/Low)",
+        "The review uses the F{N} [{Severity}] format for findings",
+        "The review process uses a subagent (Agent tool) for information asymmetry",
+        "Each finding is classified with a validity label (Real, Noise, or Undecided)",
+        "The output includes a summary table with severity counts and validity breakdown",
+        "The output presents resolution options [W], [F], [S] at the end"
+      ]
+    }
+  ]
+}

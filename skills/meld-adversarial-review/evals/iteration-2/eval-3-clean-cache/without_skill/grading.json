@@ -1,0 +1,14 @@
+{
+  "expectations": [
+    {"text": "At least 1 finding identified", "passed": true, "evidence": "9 findings across severity levels"},
+    {"text": "time.sleep concern mentioned", "passed": true, "evidence": "Issue #3 identifies time.sleep"},
+    {"text": "Severity-ordered findings", "passed": true, "evidence": "Critical > Moderate > Minor groupings"},
+    {"text": "File location references", "passed": true, "evidence": "Location lines present"},
+    {"text": "F{N} [{Severity}] format", "passed": false, "evidence": "Uses ### numbered headings"},
+    {"text": "Subagent used for information asymmetry", "passed": false, "evidence": "N/A for baseline"},
+    {"text": "Validity labels on findings", "passed": false, "evidence": "No Real/Noise/Undecided classification"},
+    {"text": "Summary table with severity/validity", "passed": false, "evidence": "No summary table with validity breakdown"},
+    {"text": "Resolution options [W], [F], [S]", "passed": false, "evidence": "Uses 'Recommended actions' list instead"}
+  ],
+  "summary": {"passed": 4, "failed": 5, "total": 9, "pass_rate": 0.44}
+}

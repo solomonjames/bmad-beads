@@ -1,0 +1,15 @@
+{
+  "expectations": [
+    {"text": "SQL injection identified as Critical", "passed": true, "evidence": "F1-F4 all [Critical/Real] for SQL injection"},
+    {"text": "At least 4 distinct findings", "passed": true, "evidence": "14 findings total"},
+    {"text": "Severity-ordered findings", "passed": true, "evidence": "Critical > High > Medium > Low ordering"},
+    {"text": "File location references", "passed": true, "evidence": "Every finding has Location: line"},
+    {"text": "F{N} [{Severity}] format", "passed": true, "evidence": "All use F1 [Critical/Real] format"},
+    {"text": "Empty test stubs identified", "passed": true, "evidence": "F10 identifies DELETE/search test gaps"},
+    {"text": "Subagent used for information asymmetry", "passed": false, "evidence": "Inline fallback - Agent tool unavailable to subagents (test harness limitation)"},
+    {"text": "Validity labels on findings", "passed": true, "evidence": "All findings labeled Real, summary shows 14 Real, 0 Undecided, 0 Noise"},
+    {"text": "Summary table with severity/validity", "passed": true, "evidence": "Summary Table present with Severity/Count/Real/Undecided/Noise columns"},
+    {"text": "Resolution options [W], [F], [S]", "passed": true, "evidence": "Resolution Options section with Walk/Fix/Skip present"}
+  ],
+  "summary": {"passed": 9, "failed": 1, "total": 10, "pass_rate": 0.90}
+}
