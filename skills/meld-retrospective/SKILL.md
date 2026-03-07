@@ -45,7 +45,7 @@ Classify each adversarial review finding into exactly one category:
 
 ### Check for Repeated Patterns
 
-Read `_meld-output/learnings.md` if it exists. Cross-reference current findings against "Common Finding Patterns" section. Flag any pattern that has occurred before — these are systemic issues worth calling out.
+Read `.meld/learnings.md` if it exists. Cross-reference current findings against "Common Finding Patterns" section. Flag any pattern that has occurred before — these are systemic issues worth calling out.
 
 ---
 
@@ -101,7 +101,7 @@ If task variance exceeds 30%, note it as a significant estimation miss. Record w
 
 ### 4a: Per-Feature Retrospective (Archival)
 
-Write to `_meld-output/retrospectives/{YYYY-MM-DD}-{feature_slug}.md`:
+Write to `.meld/retrospectives/{YYYY-MM-DD}-{feature_slug}.md`:
 
 ```markdown
 # Retrospective: {feature_slug}
@@ -127,7 +127,7 @@ Ticket: {ticket_id or "N/A"}
 
 ### 4b: Accumulated Learnings (Read-Merge-Write)
 
-Read `_meld-output/learnings.md` if it exists. Merge new data, then write back.
+Read `.meld/learnings.md` if it exists. Merge new data, then write back.
 
 Structure:
 
@@ -161,13 +161,13 @@ Update rules:
 
 On first retrospective run:
 1. Check if `CLAUDE.md` exists in the project root
-2. Check if it already contains a reference to `_meld-output/learnings.md`
+2. Check if it already contains a reference to `.meld/learnings.md`
 3. If CLAUDE.md exists and has no reference, append:
 
 ```markdown
 
 ## MELD Learnings
-See `_meld-output/learnings.md` for accumulated patterns from past implementations (common review findings, spec accuracy trends, estimation signals).
+See `.meld/learnings.md` for accumulated patterns from past implementations (common review findings, spec accuracy trends, estimation signals).
 ```
 
 Subsequent runs detect the existing reference and skip this step.

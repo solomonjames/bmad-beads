@@ -21,7 +21,7 @@ If `{ticket_id}` is set and beads is active, the ticket becomes the spec artifac
 5. Store the ticket's current `metadata` JSON for read-merge-write operations.
 
 ### Storage Routing
-- **Without beads:** Write to `_meld-output/tech-spec-wip.md` (local file flow)
+- **Without beads:** Write to `.meld/tech-spec-wip.md` (local file flow)
 - **With beads:** Write to ticket fields (`design`, `notes`, `acceptance_criteria`) + create sub-tickets for implementation tasks
 
 ### Metadata Read-Merge-Write Pattern
@@ -58,7 +58,7 @@ At skill start, create all tasks below using TaskCreate (with `subject` and `act
 
 **If `{beads_active}`:** Check `metadata.meld_step` on the ticket. If set, offer to resume from that phase. Skip local file check.
 
-**Otherwise:** Check if `_meld-output/tech-spec-wip.md` exists:
+**Otherwise:** Check if `.meld/tech-spec-wip.md` exists:
 - **If exists:** Ask — "Found an in-progress spec. Continue where we left off, or archive and start fresh?"
 - **If continuing:** Load WIP, check `stepsCompleted` frontmatter, resume from next incomplete phase
 - **If archiving:** Rename to `tech-spec-wip-archived-{date}.md`, proceed fresh
@@ -98,7 +98,7 @@ Synthesize and confirm with user:
 3. Read-merge-write metadata: merge `{"meld_phase": "spec", "meld_step": "understand", "spec_slug": "{slug}"}`
 4. `bd comment {ticket_id} "MELD quick-spec Phase 1 (Understand) complete — core understanding captured"`
 
-**Otherwise:** Create `_meld-output/tech-spec-wip.md` using the tech-spec template from `meld:meld-artifact-templates`:
+**Otherwise:** Create `.meld/tech-spec-wip.md` using the tech-spec template from `meld:meld-artifact-templates`:
 - Fill frontmatter: title, slug, date, `status: 'in-progress'`, `stepsCompleted: [1]`
 - Fill Overview section: Problem Statement, Solution, Scope
 - Leave remaining sections for subsequent phases
